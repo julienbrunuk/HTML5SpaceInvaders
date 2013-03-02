@@ -16,13 +16,14 @@ define(["require", "exports", "GameObjects"], function(require, exports, __GameO
             this.rightDown = false;
             this.leftDown = false;
             this.space = false;
+            this.lastDate = new Date();
             this.context2D = this.canvas.getContext("2d");
             this.canvas.width = Game.CANVAS_WIDTH;
             this.canvas.height = Game.CANVAS_HEIGHT;
             this.initGame();
         }
-        Game.CANVAS_WIDTH = 600;
-        Game.CANVAS_HEIGHT = 800;
+        Game.CANVAS_WIDTH = 800;
+        Game.CANVAS_HEIGHT = 600;
         Game.prototype.onKeyDown = function (evt) {
             if(evt.keyCode == 39) {
                 this.rightDown = true;
@@ -31,12 +32,14 @@ define(["require", "exports", "GameObjects"], function(require, exports, __GameO
             }
             if(evt.keyCode == 32) {
                 this.space = true;
-                var bullet = new GameObjects.GameObjects.Bullet(10);
-                this.addProjectile(bullet);
+                this.playerBullets.push(this.player.shoot());
             }
             ;
         };
         Game.prototype.onKeyUp = function (evt) {
+            if(evt.keyCode == 39) {
+                this.rightDown = false;
+            }
             if(evt.keyCode == 37) {
                 this.leftDown = false;
             }
@@ -44,23 +47,19 @@ define(["require", "exports", "GameObjects"], function(require, exports, __GameO
                 this.space = false;
             }
         };
-        Game.prototype.update = function (elapsed) {
-            var elapsedUnit = elapsed / 10;
-            if(this.rightDown) {
-                console.log(this.rightDown);
-            }
-            console.log(this.rightDown);
-            if(this.space) {
-                this.player.shoot();
-            }
+        Game.prototype.update = function () {
+            var newDate = new Date();
+            this.elapsedTime = newDate.getTime() - this.lastDate.getTime();
+            this.elapsedTime = this.elapsedTime;
+            this.lastDate = newDate;
             if(this.leftDown) {
                 this.player.xVelocity = -1;
-                this.player.x -= this.player.xVelocity * elapsedUnit;
-            }
-            if(this.rightDown) {
+                this.player.x += this.player.xVelocity * this.elapsedTime;
+            } else if(this.rightDown) {
                 this.player.xVelocity = 1;
-                this.player.x += this.player.xVelocity * elapsedUnit;
+                this.player.x += this.player.xVelocity * this.elapsedTime;
             }
+            this.player.clamp(Game.CANVAS_WIDTH);
             this.playerBullets.forEach(function (bullet) {
                 bullet.update();
             });
@@ -71,6 +70,7 @@ define(["require", "exports", "GameObjects"], function(require, exports, __GameO
                 return enemy.active;
             });
             this.updateEnemies();
+            this.handleCollisions();
             this.draw();
         };
         Game.prototype.initGame = function () {
@@ -120,9 +120,6 @@ define(["require", "exports", "GameObjects"], function(require, exports, __GameO
                 this.stars.push(star);
             }
         };
-        Game.prototype.addProjectile = function (projectile) {
-            this.playerBullets.push(projectile);
-        };
         Game.prototype.collides = function (a, b) {
             return a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
         };
@@ -130,6 +127,7 @@ define(["require", "exports", "GameObjects"], function(require, exports, __GameO
             this.playerBullets.forEach(function (bullet) {
                 this.enemies.forEach(function (enemy) {
                     if(this.collides(bullet, enemy)) {
+                        enemy.explode();
                         bullet.active = false;
                     }
                 });
@@ -139,11 +137,14 @@ define(["require", "exports", "GameObjects"], function(require, exports, __GameO
             this.drawBackground();
             this.player.draw(this.context2D);
             var that = this;
-            this.stars.forEach(function (star) {
-                star.draw(that.context2D);
+            this.stars.forEach(function (thing) {
+                thing.draw(that.context2D);
             });
-            this.enemies.forEach(function (enemy) {
-                enemy.draw(that.context2D);
+            this.enemies.forEach(function (thing) {
+                thing.draw(that.context2D);
+            });
+            this.playerBullets.forEach(function (thing) {
+                thing.draw(that.context2D);
             });
         };
         Game.prototype.willAtLeastOneEmemyLeaveBoundsOnNextUpdate = function () {
@@ -155,25 +156,24 @@ define(["require", "exports", "GameObjects"], function(require, exports, __GameO
             return false;
         };
         Game.prototype.updateEnemies = function () {
+            var self = this;
             if(this.willAtLeastOneEmemyLeaveBoundsOnNextUpdate()) {
                 this.reverseEnemyWaveAndDropDown();
             }
             this.enemies.forEach(function (enemy) {
-                enemy.x += enemy.xVelocity * 2;
+                enemy.x += enemy.xVelocity * 0.01 * self.elapsedTime;
             });
         };
         return Game;
     })();    
     $(document).ready(function () {
         var game = new Game();
-        $(document).keydown(game.onKeyDown);
-        $(document).keyup(game.onKeyUp);
-        var timeA = new Date().getTime();
+        $(document).keydown(game.onKeyDown.bind(game));
+        $(document).keyup(game.onKeyUp.bind(game));
         setInterval(function () {
-            var timeB = new Date().getTime();
-            var elapsedTime = timeB - timeA;
-            game.update(elapsedTime);
+            game.update();
             game.draw();
         }, 1000 / this.FPS);
     });
 })
+//@ sourceMappingURL=game.js.map

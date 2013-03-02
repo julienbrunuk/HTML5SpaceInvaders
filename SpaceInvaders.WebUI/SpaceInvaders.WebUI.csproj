@@ -32,55 +32,26 @@
     <Content Include="javascripts\jquery.hotkeys.js" />
     <Content Include="javascripts\require.js" />
     <Content Include="javascripts\util.js" />
-    <TypeScriptCompile Include="ts\Common.ts" />
-    <Content Include="ts\Common.js">
-      <DependentUpon>Common.ts</DependentUpon>
-    </Content>
-    <Content Include="ts\Common.min.js">
-      <DependentUpon>Common.ts</DependentUpon>
-    </Content>
     <Content Include="ts\d.ts\jquery-1.8.d.ts" />
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="ts\GameObjects.ts" />
     <TypeScriptCompile Include="ts\game.ts" />
     <Content Include="ts\game.js">
-      <DependentUpon>game.ts</DependentUpon>
-    </Content>
-    <Content Include="ts\game.min.js">
       <DependentUpon>game.ts</DependentUpon>
     </Content>
     <Content Include="ts\GameObjects.js">
       <DependentUpon>GameObjects.ts</DependentUpon>
     </Content>
-    <Content Include="ts\GameObjects.min.js">
+    <Content Include="ts\GameObjects.js.map">
       <DependentUpon>GameObjects.ts</DependentUpon>
     </Content>
-    <TypeScriptCompile Include="ts\GameObjects2.ts" />
-    <Content Include="ts\GameObjects2.js">
-      <DependentUpon>GameObjects2.ts</DependentUpon>
-    </Content>
-    <Content Include="ts\GameObjects2.min.js">
-      <DependentUpon>GameObjects2.ts</DependentUpon>
-    </Content>
+    <TypeScriptCompile Include="ts\GameObjects.ts" />
     <Content Include="web.config" />
     <Content Include="ts\game.min.js.map">
       <DependentUpon>game.js</DependentUpon>
     </Content>
-    <Content Include="ts\GameObjects.min.js.map">
-      <DependentUpon>GameObjects.js</DependentUpon>
-    </Content>
     <Content Include="ts\game.js.map">
       <DependentUpon>game.ts</DependentUpon>
-    </Content>
-    <Content Include="ts\GameObjects.js.map">
-      <DependentUpon>GameObjects.ts</DependentUpon>
-    </Content>
-    <Content Include="ts\Common.js.map">
-      <DependentUpon>Common.ts</DependentUpon>
-    </Content>
-    <Content Include="ts\GameObjects2.js.map">
-      <DependentUpon>GameObjects2.ts</DependentUpon>
     </Content>
     <None Include="web.Release.config">
       <DependentUpon>web.config</DependentUpon>
@@ -116,6 +87,6 @@
     </VisualStudio>
   </ProjectExtensions>
   <Target Name="BeforeBuild">
-    <Exec Command="&quot;$(PROGRAMFILES)\Microsoft SDKs\TypeScript\tsc&quot; -module amd -target ES5 @(TypeScriptCompile ->'&quot;%(fullpath)&quot;', ' ')" IgnoreExitCode="true" />
+    <Exec Command="&quot;$(MSBuildProgramFiles32)\Microsoft SDKs\TypeScript\tsc&quot; -sourcemap -module amd -target ES5 @(TypeScriptCompile ->'&quot;%(fullpath)&quot;', ' ')" IgnoreExitCode="true" />
   </Target>
 </Project>

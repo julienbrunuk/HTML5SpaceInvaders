@@ -14,11 +14,18 @@ define(["require", "exports"], function(require, exports) {
             };
             Player.prototype.update = function () {
             };
+            Player.prototype.clamp = function (gameWidth) {
+                if(this.x < 0) {
+                    this.x = 0;
+                    return;
+                } else if(this.x > (gameWidth - this.width)) {
+                    this.x = gameWidth - this.width;
+                    return;
+                }
+            };
             Player.prototype.shoot = function () {
                 var bulletPosition = this.midpoint();
-                if(this.OnShoot) {
-                    return new Bullet(3);
-                }
+                return new Bullet(bulletPosition, -4);
             };
             Player.prototype.midpoint = function () {
                 return {
@@ -33,16 +40,16 @@ define(["require", "exports"], function(require, exports) {
         GameObjects.Player = Player;        
         ;
         var Bullet = (function () {
-            function Bullet(speed) {
-                this.color = "#000";
-                this.x = 22;
-                this.y = 22;
+            function Bullet(position, speed) {
+                if (typeof speed === "undefined") { speed = -2; }
+                this.color = "#fff";
                 this.width = 3;
                 this.height = 3;
                 this.xVelocity = 0;
-                this.yVelocity = -2;
                 this.active = true;
-                this.xVelocity = speed;
+                this.x = position.x;
+                this.y = position.y;
+                this.yVelocity = speed;
             }
             Bullet.prototype.inBounds = function () {
                 return true;
@@ -55,9 +62,6 @@ define(["require", "exports"], function(require, exports) {
                 this.x += this.xVelocity;
                 this.y += this.yVelocity;
                 this.active = this.active && this.inBounds();
-            };
-            Bullet.prototype.explode = function () {
-                this.active = false;
             };
             return Bullet;
         })();
@@ -73,8 +77,9 @@ define(["require", "exports"], function(require, exports) {
             }
             Star.MAX_RADIUS = 5;
             Star.prototype.draw = function (context) {
-                context.fillStyle = this.color;
+                context.fillStyle = "#ffffff";
                 context.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
+                context.arc(this.x, this.y, this.radius, 0, 112, false);
             };
             Star.prototype.update = function () {
             };
@@ -100,6 +105,9 @@ define(["require", "exports"], function(require, exports) {
                 canvas.fillStyle = this.color;
                 canvas.fillRect(this.x, this.y, this.width, this.height);
             };
+            Enemy.prototype.explode = function () {
+                this.active = false;
+            };
             Enemy.prototype.update = function () {
             };
             return Enemy;
@@ -108,3 +116,4 @@ define(["require", "exports"], function(require, exports) {
     })(exports.GameObjects || (exports.GameObjects = {}));
     var GameObjects = exports.GameObjects;
 })
+//@ sourceMappingURL=GameObjects.js.map

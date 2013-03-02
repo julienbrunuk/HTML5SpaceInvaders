@@ -1,22 +1,24 @@
 ///<reference path="d.ts/jquery-1.8.d.ts" />
 ///<reference path="../javascripts/jquery-1.8.2.js/>
+
+
 import GameObjects = module("GameObjects")
 
 class Game {
-    static CANVAS_WIDTH: number = 600;
-    static CANVAS_HEIGHT: number = 800;
+    static CANVAS_WIDTH: number = 800;
+    static CANVAS_HEIGHT: number = 600;
+
 
     NUMBER_OF_STARS: number = 50;
     FPS: number = 10;
 
     enemies = [];
-    playerBullets  = [];
+    playerBullets = [];
     player: GameObjects.GameObjects.Player = new GameObjects.GameObjects.Player();
 
     canvas: HTMLCanvasElement = <HTMLCanvasElement> document.getElementById('canvas');
 
     context2D: CanvasRenderingContext2D;
-
 
     //background scenery objects
     playBaseHeight: number = 20;
@@ -29,6 +31,9 @@ class Game {
     leftDown: bool = false;
     space: bool = false;
 
+    lastDate: Date = new Date();
+    elapsedTime: number;
+
     constructor() {
         this.context2D = this.canvas.getContext("2d");
         this.canvas.width = Game.CANVAS_WIDTH;
@@ -37,83 +42,63 @@ class Game {
         this.initGame();
     }
 
-
     onKeyDown(evt) {
         if (evt.keyCode == 39) this.rightDown = true;
         else if (evt.keyCode == 37) this.leftDown = true;
         if (evt.keyCode == 32) {
             this.space = true;
-            var bullet = new GameObjects.GameObjects.Bullet(10);
-            this.addProjectile(bullet);
+            this.playerBullets.push(this.player.shoot());
         };
     }
 
     onKeyUp(evt) {
-//        if (evt.keyCode == 39) this.rightDown = false;
+        if (evt.keyCode == 39) this.rightDown = false;
         if (evt.keyCode == 37) this.leftDown = false;
         if (evt.keyCode == 32) this.space = false;
     }
 
-
-    update(elapsed: number) {
-        var elapsedUnit = elapsed / 10;
-
-        //todo get this player movement working
-        if (this.rightDown) {
-            console.log(this.rightDown);
-        }
-        console.log(this.rightDown);
-        if (this.space) {
-            this.player.shoot();
-        }
+    update() {
+        var newDate: Date = new Date();
+         this.elapsedTime = newDate.getTime() - this.lastDate.getTime();
+         this.elapsedTime = this.elapsedTime ;
+        this.lastDate = newDate;
+        // var elapsedUnit = 4;
 
         if (this.leftDown) {
             this.player.xVelocity = -1;
-            this.player.x -= this.player.xVelocity * elapsedUnit;
+            this.player.x += this.player.xVelocity * this.elapsedTime;
         }
-
-        if (this.rightDown) {
-
+        else if (this.rightDown) {
             this.player.xVelocity = 1;
-            this.player.x += this.player.xVelocity * elapsedUnit;
+            this.player.x += this.player.xVelocity * this.elapsedTime;
         }
-
-        //todo clamp the user to the game bounds
+        this.player.clamp(Game.CANVAS_WIDTH);
         //this.player.x = this.player.x.clamp(0, Game.CANVAS_WIDTH - this.player.width);
-        
-        this.playerBullets.forEach(function ( bullet:GameObjects.GameObjects.Bullet) {
+
+        this.playerBullets.forEach(function (bullet: GameObjects.GameObjects.Bullet) {
             bullet.update();
         });
-        
-
         this.playerBullets = this.playerBullets.filter(function (bullet) {
             return bullet.active;
         });
-
-        
         this.enemies = this.enemies.filter(function (enemy) {
             return enemy.active;
         });
+
         this.updateEnemies();
-
-        //handleCollisions();
-
-        //if (Math.random() < 0.1) {
-        //    //  enemies.push(Enemy());
-        //}
-
+        this.handleCollisions();
         this.draw();
     }
 
-        initGame() {
-            this.player.x = 0;
-            this.player.y = Game.CANVAS_HEIGHT - this.playBaseHeight - this.player.height;
-            this.player.OnShoot = function (bullet: GameObjects.GameObjects.Bullet) {
-                this.playerBullets.push(bullet);
-            }
-            this.nextWave();
-            this.createStars();
+    initGame() {
+        this.player.x = 0;
+        this.player.y = Game.CANVAS_HEIGHT - this.playBaseHeight - this.player.height;
+        this.player.OnShoot = function (bullet: GameObjects.GameObjects.Bullet) {
+            this.playerBullets.push(bullet);
         }
+        this.nextWave();
+        this.createStars();
+    }
 
 
     drawBackground() {
@@ -165,10 +150,6 @@ class Game {
         }
     }
 
-    addProjectile(projectile) {
-        this.playerBullets.push(projectile);
-    }
-
     collides(a, b) {
         return a.x < b.x + b.width &&
           a.x + a.width > b.x &&
@@ -180,7 +161,7 @@ class Game {
         this.playerBullets.forEach(function (bullet: GameObjects.GameObjects.Bullet) {
             this.enemies.forEach(function (enemy: GameObjects.GameObjects.Enemy) {
                 if (this.collides(bullet, enemy)) {
-                    //enemy.explode();
+                    enemy.explode();
                     bullet.active = false;
                 }
             });
@@ -191,18 +172,16 @@ class Game {
         this.drawBackground();
         this.player.draw(this.context2D);
 
-        //todo
-        //this.playerBullets.forEach(function (bullet:GameObjects.GameObjects.Bullet) {
-        //    bullet.draw();
-        //});
-
         var that = this;
 
-        this.stars.forEach(function (star) {
-            star.draw(that.context2D);
+        this.stars.forEach(function (thing) {
+            thing.draw(that.context2D);
         });
-        this.enemies.forEach(function (enemy) {
-            enemy.draw(that.context2D);
+        this.enemies.forEach(function (thing) {
+            thing.draw(that.context2D);
+        });
+        this.playerBullets.forEach(function (thing: GameObjects.GameObjects.Bullet) {
+            thing.draw(that.context2D);
         });
     }
 
@@ -216,30 +195,25 @@ class Game {
     }
 
     updateEnemies() {
+        var self = this
         if (this.willAtLeastOneEmemyLeaveBoundsOnNextUpdate()) {
             this.reverseEnemyWaveAndDropDown();
         }
         this.enemies.forEach(function (enemy: GameObjects.GameObjects.Enemy) {
-            enemy.x += enemy.xVelocity * 2;
+            enemy.x += enemy.xVelocity * 0.01* self.elapsedTime;
         });
     }
 }
 
 //normal js stuff
 $(document).ready(function () {
-    var game: Game = new Game;
-
-    $(document).keydown(game.onKeyDown);
-    $(document).keyup(game.onKeyUp);
-    //game.update();
-    //game.draw();
-    var timeA = new Date().getTime();
+    var game: Game = new Game();
+    $(document).keydown(game.onKeyDown.bind(game));
+    $(document).keyup(game.onKeyUp.bind(game));
     setInterval(function () {
 
-        var timeB = new Date().getTime();
-        var elapsedTime = timeB - timeA
 
-        game.update(elapsedTime);
+        game.update();
         game.draw();
     }, 1000 / this.FPS);
 });
