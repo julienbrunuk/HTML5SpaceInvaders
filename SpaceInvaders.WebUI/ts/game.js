@@ -7,7 +7,7 @@ define(["require", "exports", "GameObjects"], function(require, exports, __GameO
             this.FPS = 10;
             this.enemies = [];
             this.playerBullets = [];
-            this.player = new GameObjects.GameObjects.Player();
+            this.player = new GameObjects.Player();
             this.canvas = document.getElementById('canvas');
             this.playBaseHeight = 20;
             this.playBaseColor = "blue";
@@ -95,9 +95,9 @@ define(["require", "exports", "GameObjects"], function(require, exports, __GameO
             for(var i = 0; i <= 6; i++) {
                 for(var j = 0; j <= 3; j++) {
                     if(j == 0) {
-                        var enemy = new GameObjects.GameObjects.Enemy(10 + (i * 34), 40 + (j * 25), GameObjects.GameObjects.Enemy.BOSS_color);
+                        var enemy = new GameObjects.Enemy(10 + (i * 34), 40 + (j * 25), GameObjects.Enemy.BOSS_color);
                     } else {
-                        var enemy = new GameObjects.GameObjects.Enemy(10 + (i * 34), 40 + (j * 25), GameObjects.GameObjects.Enemy.BOSS_color);
+                        var enemy = new GameObjects.Enemy(10 + (i * 34), 40 + (j * 25), GameObjects.Enemy.BOSS_color);
                     }
                     this.addEnemy(enemy);
                 }
@@ -116,7 +116,7 @@ define(["require", "exports", "GameObjects"], function(require, exports, __GameO
             for(var i = 0; i <= this.NUMBER_OF_STARS; i++) {
                 var randX = Math.round(Math.random() * Game.CANVAS_WIDTH);
                 var randY = Math.round(Math.random() * Game.CANVAS_HEIGHT);
-                var star = new GameObjects.GameObjects.Star(randX, randY);
+                var star = new GameObjects.Star(randX, randY);
                 this.stars.push(star);
             }
         };
@@ -124,9 +124,10 @@ define(["require", "exports", "GameObjects"], function(require, exports, __GameO
             return a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
         };
         Game.prototype.handleCollisions = function () {
-            this.playerBullets.forEach(function (bullet) {
-                this.enemies.forEach(function (enemy) {
-                    if(this.collides(bullet, enemy)) {
+            var self = this;
+            self.playerBullets.forEach(function (bullet) {
+                self.enemies.forEach(function (enemy) {
+                    if(self.collides(bullet, enemy)) {
                         enemy.explode();
                         bullet.active = false;
                     }
@@ -161,7 +162,7 @@ define(["require", "exports", "GameObjects"], function(require, exports, __GameO
                 this.reverseEnemyWaveAndDropDown();
             }
             this.enemies.forEach(function (enemy) {
-                enemy.x += enemy.xVelocity * 0.01 * self.elapsedTime;
+                enemy.x += enemy.xVelocity * 0.05 * self.elapsedTime;
             });
         };
         return Game;

@@ -21,11 +21,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="app.css" />
-    <Content Include="Copy of index.old.html" />
     <Content Include="index.html" />
     <Content Include="images\enemy.png" />
     <Content Include="images\player.png" />
-    <Content Include="index.old.html" />
     <None Include="javascripts\jquery-1.8.2-vsdoc.js" />
     <Content Include="javascripts\jquery-1.8.2.js" />
     <Content Include="javascripts\jquery-1.8.2.min.js" />

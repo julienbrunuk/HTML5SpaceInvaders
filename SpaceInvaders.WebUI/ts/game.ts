@@ -1,5 +1,6 @@
 ///<reference path="d.ts/jquery-1.8.d.ts" />
 ///<reference path="../javascripts/jquery-1.8.2.js/>
+///<reference path="d.ts/GameObjects.ts/>
 
 
 import GameObjects = module("GameObjects")
@@ -14,7 +15,7 @@ class Game {
 
     enemies = [];
     playerBullets = [];
-    player: GameObjects.GameObjects.Player = new GameObjects.GameObjects.Player();
+    player:GameObjects.Player = new GameObjects.Player();
 
     canvas: HTMLCanvasElement = <HTMLCanvasElement> document.getElementById('canvas');
 
@@ -75,7 +76,7 @@ class Game {
         this.player.clamp(Game.CANVAS_WIDTH);
         //this.player.x = this.player.x.clamp(0, Game.CANVAS_WIDTH - this.player.width);
 
-        this.playerBullets.forEach(function (bullet: GameObjects.GameObjects.Bullet) {
+        this.playerBullets.forEach(function (bullet: GameObjects.Bullet) {
             bullet.update();
         });
         this.playerBullets = this.playerBullets.filter(function (bullet) {
@@ -93,7 +94,7 @@ class Game {
     initGame() {
         this.player.x = 0;
         this.player.y = Game.CANVAS_HEIGHT - this.playBaseHeight - this.player.height;
-        this.player.OnShoot = function (bullet: GameObjects.GameObjects.Bullet) {
+        this.player.OnShoot = function (bullet: GameObjects.Bullet) {
             this.playerBullets.push(bullet);
         }
         this.nextWave();
@@ -117,16 +118,16 @@ class Game {
         for (var i = 0; i <= 6; i++) {
             for (var j = 0; j <= 3; j++) {
                 if (j == 0) {
-                    var enemy = new GameObjects.GameObjects.Enemy(10 + (i * 34), 40 + (j * 25), GameObjects.GameObjects.Enemy.BOSS_color);
+                    var enemy = new GameObjects.Enemy(10 + (i * 34), 40 + (j * 25), GameObjects.Enemy.BOSS_color);
                 } else {
-                    var enemy = new GameObjects.GameObjects.Enemy(10 + (i * 34), 40 + (j * 25), GameObjects.GameObjects.Enemy.BOSS_color);
+                    var enemy = new GameObjects.Enemy(10 + (i * 34), 40 + (j * 25), GameObjects.Enemy.BOSS_color);
                 }
                 this.addEnemy(enemy);
             }
         }
 
         //init the speeds
-        this.enemies.forEach(function (enemy: GameObjects.GameObjects.Enemy) {
+        this.enemies.forEach(function (enemy: GameObjects.Enemy) {
             //moving to the right
             enemy.xVelocity = 1;
         });
@@ -134,7 +135,7 @@ class Game {
     }
 
     reverseEnemyWaveAndDropDown() {
-        this.enemies.forEach(function (enemy: GameObjects.GameObjects.Enemy) {
+        this.enemies.forEach(function (enemy: GameObjects.Enemy) {
             //moving to the right
             enemy.xVelocity = enemy.xVelocity * -1;
             enemy.y += enemy.height;
@@ -145,7 +146,7 @@ class Game {
         for (var i = 0; i <= this.NUMBER_OF_STARS; i++) {
             var randX = Math.round(Math.random() * Game.CANVAS_WIDTH);
             var randY = Math.round(Math.random() * Game.CANVAS_HEIGHT);
-            var star = new GameObjects.GameObjects.Star(randX, randY);
+            var star = new GameObjects.Star(randX, randY);
             this.stars.push(star);
         }
     }
@@ -158,9 +159,10 @@ class Game {
     }
 
     handleCollisions() {
-        this.playerBullets.forEach(function (bullet: GameObjects.GameObjects.Bullet) {
-            this.enemies.forEach(function (enemy: GameObjects.GameObjects.Enemy) {
-                if (this.collides(bullet, enemy)) {
+        var self = this;
+        self.playerBullets.forEach(function (bullet: GameObjects.Bullet) {
+            self.enemies.forEach(function (enemy: GameObjects.Enemy) {
+                if (self.collides(bullet, enemy)) {
                     enemy.explode();
                     bullet.active = false;
                 }
@@ -180,7 +182,7 @@ class Game {
         this.enemies.forEach(function (thing) {
             thing.draw(that.context2D);
         });
-        this.playerBullets.forEach(function (thing: GameObjects.GameObjects.Bullet) {
+        this.playerBullets.forEach(function (thing: GameObjects.Bullet) {
             thing.draw(that.context2D);
         });
     }
@@ -199,8 +201,8 @@ class Game {
         if (this.willAtLeastOneEmemyLeaveBoundsOnNextUpdate()) {
             this.reverseEnemyWaveAndDropDown();
         }
-        this.enemies.forEach(function (enemy: GameObjects.GameObjects.Enemy) {
-            enemy.x += enemy.xVelocity * 0.01* self.elapsedTime;
+        this.enemies.forEach(function (enemy: GameObjects.Enemy) {
+            enemy.x += enemy.xVelocity * 0.05* self.elapsedTime;
         });
     }
 }
@@ -208,6 +210,7 @@ class Game {
 //normal js stuff
 $(document).ready(function () {
     var game: Game = new Game();
+    //game.handleCollisions.bind(game);
     $(document).keydown(game.onKeyDown.bind(game));
     $(document).keyup(game.onKeyUp.bind(game));
     setInterval(function () {
