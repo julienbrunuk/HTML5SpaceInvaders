@@ -1,5 +1,7 @@
-define(["require", "exports", "GameObjects"], function(require, exports, __GameObjects__) {
+define(["require", "exports", "GameObjects", "Common"], function(require, exports, __GameObjects__, __Common__) {
     var GameObjects = __GameObjects__;
+
+    var Common = __Common__;
 
     var Game = (function () {
         function Game() {
@@ -24,13 +26,24 @@ define(["require", "exports", "GameObjects"], function(require, exports, __GameO
         }
         Game.CANVAS_WIDTH = 800;
         Game.CANVAS_HEIGHT = 600;
+        Game.prototype.update = function () {
+            var newDate = new Date();
+            var elapsedTime = newDate.getTime() - this.lastDate.getTime();
+            var elapsedReduced = (elapsedTime / 10000) * Common.GAME_DEFAULTS.GAME_SPEED;
+            this.lastDate = newDate;
+            this.updateBullets(elapsedReduced);
+            this.updatePlayer(elapsedReduced);
+            this.updateEnemies(elapsedReduced);
+            this.handleCollisions();
+            this.draw();
+        };
         Game.prototype.onKeyDown = function (evt) {
-            if(evt.keyCode == 39) {
+            if(evt.keyCode == Common.KEYS.RIGHT) {
                 this.rightDown = true;
-            } else if(evt.keyCode == 37) {
+            } else if(evt.keyCode == Common.KEYS.LEFT) {
                 this.leftDown = true;
             }
-            if(evt.keyCode == 32) {
+            if(evt.keyCode == Common.KEYS.SPACE) {
                 this.space = true;
                 this.playerBullets.push(this.player.shoot());
             }
@@ -47,32 +60,6 @@ define(["require", "exports", "GameObjects"], function(require, exports, __GameO
                 this.space = false;
             }
         };
-        Game.prototype.update = function () {
-            var newDate = new Date();
-            this.elapsedTime = newDate.getTime() - this.lastDate.getTime();
-            this.elapsedTime = this.elapsedTime;
-            this.lastDate = newDate;
-            if(this.leftDown) {
-                this.player.xVelocity = -1;
-                this.player.x += this.player.xVelocity * this.elapsedTime;
-            } else if(this.rightDown) {
-                this.player.xVelocity = 1;
-                this.player.x += this.player.xVelocity * this.elapsedTime;
-            }
-            this.player.clamp(Game.CANVAS_WIDTH);
-            this.playerBullets.forEach(function (bullet) {
-                bullet.update();
-            });
-            this.playerBullets = this.playerBullets.filter(function (bullet) {
-                return bullet.active;
-            });
-            this.enemies = this.enemies.filter(function (enemy) {
-                return enemy.active;
-            });
-            this.updateEnemies();
-            this.handleCollisions();
-            this.draw();
-        };
         Game.prototype.initGame = function () {
             this.player.x = 0;
             this.player.y = Game.CANVAS_HEIGHT - this.playBaseHeight - this.player.height;
@@ -82,11 +69,18 @@ define(["require", "exports", "GameObjects"], function(require, exports, __GameO
             this.nextWave();
             this.createStars();
         };
+        Game.prototype.isCompatible = function () {
+            return Object.create && Object.extend && Function.bind && document.addEventListener;
+        };
         Game.prototype.drawBackground = function () {
-            this.context2D.fillStyle = this.spaceColor;
-            this.context2D.fillRect(0, 0, Game.CANVAS_WIDTH, Game.CANVAS_HEIGHT);
-            this.context2D.fillStyle = this.playBaseColor;
-            this.context2D.fillRect(0, Game.CANVAS_HEIGHT - this.playBaseHeight, Game.CANVAS_WIDTH, this.playBaseHeight);
+            var self = this;
+            self.stars.forEach(function (thing) {
+                thing.draw(self.context2D);
+            });
+            self.context2D.fillStyle = self.spaceColor;
+            self.context2D.fillRect(0, 0, Game.CANVAS_WIDTH, Game.CANVAS_HEIGHT);
+            self.context2D.fillStyle = self.playBaseColor;
+            self.context2D.fillRect(0, Game.CANVAS_HEIGHT - self.playBaseHeight, Game.CANVAS_WIDTH, self.playBaseHeight);
         };
         Game.prototype.addEnemy = function (enemy) {
             this.enemies.push(enemy);
@@ -138,9 +132,6 @@ define(["require", "exports", "GameObjects"], function(require, exports, __GameO
             this.drawBackground();
             this.player.draw(this.context2D);
             var that = this;
-            this.stars.forEach(function (thing) {
-                thing.draw(that.context2D);
-            });
             this.enemies.forEach(function (thing) {
                 thing.draw(that.context2D);
             });
@@ -156,14 +147,70 @@ define(["require", "exports", "GameObjects"], function(require, exports, __GameO
             }
             return false;
         };
-        Game.prototype.updateEnemies = function () {
+        Game.prototype.updateEnemies = function (elapsedUnit) {
             var self = this;
+            this.enemies = this.enemies.filter(function (enemy) {
+                return enemy.active;
+            });
             if(this.willAtLeastOneEmemyLeaveBoundsOnNextUpdate()) {
                 this.reverseEnemyWaveAndDropDown();
             }
             this.enemies.forEach(function (enemy) {
-                enemy.x += enemy.xVelocity * 0.05 * self.elapsedTime;
+                enemy.x += enemy.xVelocity * elapsedUnit;
             });
+        };
+        Game.prototype.updatePlayer = function (elapsedTime) {
+            if(this.leftDown) {
+                this.player.xVelocity = -this.player.DefaultMovementSpeed;
+            } else if(this.rightDown) {
+                this.player.xVelocity = this.player.DefaultMovementSpeed;
+            } else {
+                this.player.xVelocity = 0;
+            }
+            this.player.update(elapsedTime);
+            this.player.clamp(Game.CANVAS_WIDTH);
+        };
+        Game.prototype.updateBullets = function (elapsedUnit) {
+            this.playerBullets = this.playerBullets.filter(function (bullet) {
+                return bullet.active;
+            });
+            this.playerBullets.forEach(function (bullet) {
+                bullet.update(elapsedUnit);
+            });
+        };
+        Game.prototype.addEvent = function (obj, type, fn) {
+            obj.addEventListener(type, fn, false);
+        };
+        Game.prototype.removeEvent = function (obj, type, fn) {
+            obj.removeEventListener(type, fn, false);
+        };
+        Game.prototype.resetStats = function () {
+            this.stats = {
+                count: 0,
+                fps: 0,
+                update: 0,
+                draw: 0,
+                frame: 0
+            };
+        };
+        Game.prototype.loadImages = function (sources, callback) {
+            var images = {
+            };
+            var count = sources ? sources.length : 0;
+            if(count == 0) {
+                callback(images);
+            } else {
+                for(var n = 0; n < sources.length; n++) {
+                    var source = sources[n];
+                    var image = document.createElement('img');
+                    images[source] = image;
+                    this.addEvent(image, 'load', function () {
+                        if(--count == 0) {
+                            callback(images);
+                        }
+                    });
+                }
+            }
         };
         return Game;
     })();    

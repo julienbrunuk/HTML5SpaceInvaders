@@ -4,18 +4,24 @@
 export interface GameObject {
 
     draw(canvas: CanvasRenderingContext2D);
-    update();
+    update(elapsedUnit:number);
+
+}
+export interface MovementGameObject {
+
+    DefaultMovementSpeed: number;
 
 }
 
-export class Player implements GameObject {
+export class Player implements GameObject,MovementGameObject {
 
     color: string = "#F0A";
 
     x: number;
     y: number;
 
-    xVelocity: number = 5;
+    DefaultMovementSpeed: number = 10;
+    xVelocity: number = 0;
     //never used
     yVelocity: number = 0;
 
@@ -32,8 +38,8 @@ export class Player implements GameObject {
         context2D.fillRect(this.x, this.y, this.width, this.height);
     }
 
-    update() {
-        //todo
+    update(elapsedUnit) {
+        this.x += this.xVelocity * elapsedUnit;
     }
 
     clamp(gameWidth: number) {
@@ -68,18 +74,19 @@ export class Player implements GameObject {
 
 };
 
-export class Bullet implements GameObject {
+export class Bullet implements GameObject, MovementGameObject {
 
     color: string = "#fff";
 
     x: number;
     y: number;
+    DefaultMovementSpeed: number = 40;
 
     width: number = 3;
     height: number = 3;
 
     xVelocity: number = 0;
-    yVelocity: number;
+    yVelocity: number = -80;
 
     active: bool = true;
 
@@ -100,9 +107,9 @@ export class Bullet implements GameObject {
         canvas.fillRect(this.x, this.y, this.width, this.height);
     };
 
-  update() {
-        this.x += this.xVelocity;
-        this.y += this.yVelocity;
+  update(elapsedUnit) {
+        this.x += this.xVelocity * elapsedUnit;
+        this.y += this.yVelocity * elapsedUnit;
         this.active = this.active && this.inBounds();
     };
 
@@ -110,7 +117,7 @@ export class Bullet implements GameObject {
 
 }
 export class Star implements GameObject {
-    static MAX_RADIUS: number = 5;
+    static MAX_RADIUS: number = 3;
     color: string = "white";
     x: number;
     y: number;
@@ -126,29 +133,29 @@ export class Star implements GameObject {
     }
 
     draw(context: CanvasRenderingContext2D) {
-        context.fillStyle = "#ffffff";
-
-        // context.beginPath();
+        context.fillStyle = "#aaa";
+        context.beginPath();
         context.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
-
-        context.arc(this.x, this.y, this.radius, 0, 112, false);
-        //   context.stroke();
+        context.fill();
     };
 
   update() {
-        //   todo twinkle
+        if (this.twinkles) {
+
+        }
     };
 }
 
-export class Enemy implements GameObject {
+export class Enemy implements GameObject, MovementGameObject {
     health: number = 1;
 
     x: number;
     y: number;
 
+    DefaultMovementSpeed: number = 5;
     active: bool = true;
 
-    xVelocity: number = 0;
+    xVelocity: number = 10;
     yVelocity: number = 0;
     width: number = 20;
     height: number = 10;
@@ -172,7 +179,9 @@ export class Enemy implements GameObject {
         // todo boom graphic
     };
 
-  update() {
+  update(elapsedUnit) {
+        
+
         //this.x += this.xVelocity;
         //this.y += this.yVelocity;
         //   this.active = this.active && this.inBounds();

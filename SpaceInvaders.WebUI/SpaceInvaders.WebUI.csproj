@@ -30,10 +30,16 @@
     <Content Include="javascripts\jquery.hotkeys.js" />
     <Content Include="javascripts\require.js" />
     <Content Include="javascripts\util.js" />
+    <TypeScriptCompile Include="ts\Common.ts" />
+    <Content Include="ts\Common.js">
+      <DependentUpon>Common.ts</DependentUpon>
+    </Content>
     <Content Include="ts\d.ts\jquery-1.8.d.ts" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="ts\game.ts" />
+    <Content Include="ts\d.ts\lib.d.ts" />
+    <Content Include="ts\d.ts\node.d.ts" />
     <Content Include="ts\game.js">
       <DependentUpon>game.ts</DependentUpon>
     </Content>
@@ -44,6 +50,10 @@
       <DependentUpon>GameObjects.ts</DependentUpon>
     </Content>
     <TypeScriptCompile Include="ts\GameObjects.ts" />
+    <TypeScriptCompile Include="ts\Server.ts" />
+    <Content Include="ts\Server.js">
+      <DependentUpon>Server.ts</DependentUpon>
+    </Content>
     <Content Include="web.config" />
     <Content Include="ts\game.min.js.map">
       <DependentUpon>game.js</DependentUpon>

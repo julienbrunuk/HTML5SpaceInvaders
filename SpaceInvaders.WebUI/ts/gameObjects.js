@@ -2,7 +2,8 @@ define(["require", "exports"], function(require, exports) {
     var Player = (function () {
         function Player() {
             this.color = "#F0A";
-            this.xVelocity = 5;
+            this.DefaultMovementSpeed = 10;
+            this.xVelocity = 0;
             this.yVelocity = 0;
             this.width = 20;
             this.height = 30;
@@ -11,7 +12,8 @@ define(["require", "exports"], function(require, exports) {
             context2D.fillStyle = this.color;
             context2D.fillRect(this.x, this.y, this.width, this.height);
         };
-        Player.prototype.update = function () {
+        Player.prototype.update = function (elapsedUnit) {
+            this.x += this.xVelocity * elapsedUnit;
         };
         Player.prototype.clamp = function (gameWidth) {
             if(this.x < 0) {
@@ -42,9 +44,11 @@ define(["require", "exports"], function(require, exports) {
         function Bullet(position, speed) {
             if (typeof speed === "undefined") { speed = -2; }
             this.color = "#fff";
+            this.DefaultMovementSpeed = 40;
             this.width = 3;
             this.height = 3;
             this.xVelocity = 0;
+            this.yVelocity = -80;
             this.active = true;
             this.x = position.x;
             this.y = position.y;
@@ -57,9 +61,9 @@ define(["require", "exports"], function(require, exports) {
             canvas.fillStyle = this.color;
             canvas.fillRect(this.x, this.y, this.width, this.height);
         };
-        Bullet.prototype.update = function () {
-            this.x += this.xVelocity;
-            this.y += this.yVelocity;
+        Bullet.prototype.update = function (elapsedUnit) {
+            this.x += this.xVelocity * elapsedUnit;
+            this.y += this.yVelocity * elapsedUnit;
             this.active = this.active && this.inBounds();
         };
         return Bullet;
@@ -74,13 +78,16 @@ define(["require", "exports"], function(require, exports) {
             this.radius = Math.round(Math.random() * Star.MAX_RADIUS);
             this.twinkles = (Math.random() > 0.9);
         }
-        Star.MAX_RADIUS = 5;
+        Star.MAX_RADIUS = 3;
         Star.prototype.draw = function (context) {
-            context.fillStyle = "#ffffff";
+            context.fillStyle = "#aaa";
+            context.beginPath();
             context.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
-            context.arc(this.x, this.y, this.radius, 0, 112, false);
+            context.fill();
         };
         Star.prototype.update = function () {
+            if(this.twinkles) {
+            }
         };
         return Star;
     })();
@@ -88,8 +95,9 @@ define(["require", "exports"], function(require, exports) {
     var Enemy = (function () {
         function Enemy(x, y, color) {
             this.health = 1;
+            this.DefaultMovementSpeed = 5;
             this.active = true;
-            this.xVelocity = 0;
+            this.xVelocity = 10;
             this.yVelocity = 0;
             this.width = 20;
             this.height = 10;
@@ -107,7 +115,7 @@ define(["require", "exports"], function(require, exports) {
         Enemy.prototype.explode = function () {
             this.active = false;
         };
-        Enemy.prototype.update = function () {
+        Enemy.prototype.update = function (elapsedUnit) {
         };
         return Enemy;
     })();
