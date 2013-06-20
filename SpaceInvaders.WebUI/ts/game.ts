@@ -15,18 +15,17 @@ interface Object {
 }
 
 class Game {
-
-
-    
     static CANVAS_WIDTH: number = 800;
     static CANVAS_HEIGHT: number = 600;
-
 
     NUMBER_OF_STARS: number = 50;
     FPS: number = 10;
 
     enemies = [];
     playerBullets = [];
+
+    enemyBulletsSideA = [];
+
     player: GameObjects.Player = new GameObjects.Player();
 
     canvas: HTMLCanvasElement = <HTMLCanvasElement> document.getElementById('canvas');
@@ -56,18 +55,21 @@ class Game {
         var elapsedReduced: number = (elapsedTime / 10000) * Common.GAME_DEFAULTS.GAME_SPEED; // the elapsed time in ms is way to big for rendering to the canvas
 
         this.lastDate = newDate;
+
         this.updateBullets(elapsedReduced);
         this.updatePlayer(elapsedReduced);
         this.updateEnemies(elapsedReduced);
         this.handleCollisions();
         this.draw();
+
+        this.updateStats();
     }
 
     constructor() {
         this.context2D = this.canvas.getContext("2d");
         this.canvas.width = Game.CANVAS_WIDTH;
         this.canvas.height = Game.CANVAS_HEIGHT;
-        
+
         this.initGame();
     }
 
@@ -98,11 +100,11 @@ class Game {
         this.createStars();
     }
 
-    isCompatible () {
+    isCompatible() {
         return Object.create &&
                Object.extend &&
                Function.bind &&
-               document.addEventListener 
+               document.addEventListener
     }
 
     drawBackground() {
@@ -125,9 +127,9 @@ class Game {
         for (var i = 0; i <= 6; i++) {
             for (var j = 0; j <= 3; j++) {
                 if (j == 0) {
-                    var enemy = new GameObjects.Enemy(10 + (i * 34), 40 + (j * 25), GameObjects.Enemy.BOSS_color);
+                    var enemy: GameObjects.Enemy = new GameObjects.EnemyBoss(10 + (i * 34), 40 + (j * 25));
                 } else {
-                    var enemy = new GameObjects.Enemy(10 + (i * 34), 40 + (j * 25), GameObjects.Enemy.BOSS_color);
+                    enemy = new GameObjects.EnemyGrunt(10 + (i * 34), 40 + (j * 25));
                 }
                 this.addEnemy(enemy);
             }
@@ -175,6 +177,12 @@ class Game {
                 }
             });
         });
+        self.enemyBulletsSideA.forEach(function (bullet: GameObjects.Bullet) {
+            if (self.collides(bullet, self.player)) {
+                self.player.explode();
+            }
+        });
+
     }
 
     draw() {
@@ -188,6 +196,11 @@ class Game {
         this.playerBullets.forEach(function (thing: GameObjects.Bullet) {
             thing.draw(that.context2D);
         });
+        this.enemyBulletsSideA.forEach(function (thing: GameObjects.Bullet) {
+            thing.draw(that.context2D);
+        });
+        this.drawStats(this.context2D);
+
     }
 
     willAtLeastOneEmemyLeaveBoundsOnNextUpdate(): bool {
@@ -202,14 +215,17 @@ class Game {
     updateEnemies(elapsedUnit: number) {
         var self = this
 
-        this.enemies = this.enemies.filter(function (enemy) {
+        self.enemies = self.enemies.filter(function (enemy) {
             return enemy.active;
         });
-        if (this.willAtLeastOneEmemyLeaveBoundsOnNextUpdate()) {
-            this.reverseEnemyWaveAndDropDown();
+        if (self.willAtLeastOneEmemyLeaveBoundsOnNextUpdate()) {
+            self.reverseEnemyWaveAndDropDown();
         }
-        this.enemies.forEach(function (enemy: GameObjects.Enemy) {
-            enemy.x += enemy.xVelocity * elapsedUnit;
+        self.enemies.forEach(function (enemy: GameObjects.Enemy) {
+            enemy.update(elapsedUnit);
+            if (Math.random() < enemy.probabilityOfShooting) {
+                self.enemyBulletsSideA.push(enemy.shoot());
+            }
         });
     }
 
@@ -234,10 +250,15 @@ class Game {
         this.playerBullets.forEach(function (bullet: GameObjects.Bullet) {
             bullet.update(elapsedUnit);
         });
+
+
+        this.enemyBulletsSideA.forEach(function (bullet: GameObjects.Bullet) {
+            bullet.update(elapsedUnit);
+        });
     }
 
     //Pluming
-    addEvent(obj, type, fn) { 
+    addEvent(obj, type, fn) {
         obj.addEventListener(type, fn, false);
     }
 
@@ -254,27 +275,23 @@ class Game {
             frame: 0  // update + draw
         };
     }
-    /*
+
+    //_______________________________________________________________________________todo remove this in prod
     updateStats(update, draw) {
-        if (this.cfg.stats) {
-            this.stats.update = Math.max(1, update);
-            this.stats.draw = Math.max(1, draw);
-            this.stats.frame = this.stats.update + this.stats.draw;
-            this.stats.count = this.stats.count == this.fps ? 0 : this.stats.count + 1;
-            this.stats.fps = Math.min(this.fps, 1000 / this.stats.frame);
-        }
+        //this.stats.update = Math.max(1, update);
+        //this.stats.draw = Math.max(1, draw);
+        //this.stats.frame = this.stats.update + this.stats.draw;
+        //this.stats.count = this.stats.count == this.FPS ? 0 : this.stats.count + 1;
+        //this.stats.fps = Math.min(this.FPS, 1000 / this.stats.frame);
+    }
+    drawStats(ctx) {
+        ctx.fillStyle = 'white';
+        //ctx.fillText("frame: " + Math.round(this.stats.count), Game.CANVAS_WIDTH - 100, Game.CANVAS_HEIGHT - 60);
+        //ctx.fillText("fps: " + Math.round(this.stats.fps), Game.CANVAS_WIDTH - 100, Game.CANVAS_HEIGHT - 50);
+        //ctx.fillText("update: " + Math.round(this.stats.update) + "ms", Game.CANVAS_WIDTH - 100, Game.CANVAS_HEIGHT - 40);
+        //ctx.fillText("draw: " + Math.round(this.stats.draw) + "ms", Game.CANVAS_WIDTH - 100, Game.CANVAS_HEIGHT - 30);
     }
 
-    drawStats(ctx) {
-        if (this.cfg.stats) {
-            ctx.fillStyle = 'white';
-            ctx.fillText("frame: " + Math.round(this.stats.count), this.width - 100, this.height - 60);
-            ctx.fillText("fps: " + Math.round(this.stats.fps), this.width - 100, this.height - 50);
-            ctx.fillText("update: " + Math.round(this.stats.update) + "ms", this.width - 100, this.height - 40);
-            ctx.fillText("draw: " + Math.round(this.stats.draw) + "ms", this.width - 100, this.height - 30);
-        }
-    }
-    */
     loadImages(sources, callback) { /* load multiple images and callback when ALL have finished loading */
         var images = {};
         var count = sources ? sources.length : 0;

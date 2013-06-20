@@ -4,16 +4,19 @@
 export interface GameObject {
 
     draw(canvas: CanvasRenderingContext2D);
-    update(elapsedUnit:number);
+    update(elapsedUnit: number);
 
 }
 export interface MovementGameObject {
 
-    DefaultMovementSpeed: number;
+
+    DefaultSlowMovementSpeed: number;
+    DefaultMediumMovementSpeed: number;
+    DefaultFastMovementSpeed: number;
 
 }
 
-export class Player implements GameObject,MovementGameObject {
+export class Player implements GameObject, MovementGameObject {
 
     color: string = "#F0A";
 
@@ -21,6 +24,11 @@ export class Player implements GameObject,MovementGameObject {
     y: number;
 
     DefaultMovementSpeed: number = 10;
+
+    DefaultSlowMovementSpeed: number = 5;
+    DefaultMediumMovementSpeed: number = 8;
+    DefaultFastMovementSpeed: number = 11;
+
     xVelocity: number = 0;
     //never used
     yVelocity: number = 0;
@@ -66,10 +74,9 @@ export class Player implements GameObject,MovementGameObject {
             y: this.y + this.height / 2
         };
     };
-
         //todo
        explode() {
-
+        this.color = "#F00";
     };
 
 };
@@ -80,13 +87,15 @@ export class Bullet implements GameObject, MovementGameObject {
 
     x: number;
     y: number;
-    DefaultMovementSpeed: number = 40;
+    DefaultSlowMovementSpeed: number = 2;
+    DefaultMediumMovementSpeed: number = 4;
+    DefaultFastMovementSpeed: number = 6;
 
     width: number = 3;
     height: number = 3;
 
     xVelocity: number = 0;
-    yVelocity: number = -80;
+    yVelocity: number = 0;
 
     active: bool = true;
 
@@ -147,45 +156,79 @@ export class Star implements GameObject {
 }
 
 export class Enemy implements GameObject, MovementGameObject {
-    health: number = 1;
+    health: number;
 
     x: number;
     y: number;
 
-    DefaultMovementSpeed: number = 5;
+    DefaultSlowMovementSpeed: number = 3;
+    DefaultMediumMovementSpeed: number = 6;
+    DefaultFastMovementSpeed: number = 10;
+
+    DefaultProjectitleSpeed: number = 4;
     active: bool = true;
 
     xVelocity: number = 10;
     yVelocity: number = 0;
     width: number = 20;
     height: number = 10;
-    static BOSS_color: string = "#0F0";
-    static GRUNT_color: string = "#0F9";
 
-    color: string = "#0F9";
+    probabilityOfShooting: number = 0.001;
 
-    constructor(x: number, y: number, color: string) {
+    BasicColor: string;
+
+    constructor(x: number, y: number) {
         this.x = x;
         this.y = y;
-        this.color = color;
     }
+
     draw(canvas: CanvasRenderingContext2D) {
-        canvas.fillStyle = this.color;
+        canvas.fillStyle = this.BasicColor;
         canvas.fillRect(this.x, this.y, this.width, this.height);
     };
 
-         explode() {
+    midpoint() {
+        return {
+            x: this.x + this.width / 2,
+            y: this.y + this.height / 2
+        };
+    };
+
+    shoot() {
+        // todo Sound.play("shoot");
+        var bulletPosition = this.midpoint();
+        return new Bullet(bulletPosition, this.DefaultProjectitleSpeed);
+    };
+
+    explode() {
         this.active = false;
         // todo boom graphic
     };
 
   update(elapsedUnit) {
-        
-
+        this.x += this.xVelocity * elapsedUnit;
         //this.x += this.xVelocity;
         //this.y += this.yVelocity;
         //   this.active = this.active && this.inBounds();
     };
 }
 
+export class EnemyGrunt extends Enemy {
 
+    constructor(x: number, y: number) {
+        super(x,y);
+        this.BasicColor = "#0F9";
+        this.probabilityOfShooting = 0.001;
+        this.health = 1;
+    }
+}
+
+export class EnemyBoss extends Enemy {
+
+    constructor(x: number, y: number) {
+        super(x, y);
+        this.BasicColor = "RED";
+        this.probabilityOfShooting = 0.003;
+        this.health = 3;
+    }
+}

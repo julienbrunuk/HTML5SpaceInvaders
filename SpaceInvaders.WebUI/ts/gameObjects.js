@@ -1,8 +1,16 @@
+var __extends = this.__extends || function (d, b) {
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 define(["require", "exports"], function(require, exports) {
     var Player = (function () {
         function Player() {
             this.color = "#F0A";
             this.DefaultMovementSpeed = 10;
+            this.DefaultSlowMovementSpeed = 5;
+            this.DefaultMediumMovementSpeed = 8;
+            this.DefaultFastMovementSpeed = 11;
             this.xVelocity = 0;
             this.yVelocity = 0;
             this.width = 20;
@@ -35,6 +43,7 @@ define(["require", "exports"], function(require, exports) {
             };
         };
         Player.prototype.explode = function () {
+            this.color = "#F00";
         };
         return Player;
     })();
@@ -44,11 +53,13 @@ define(["require", "exports"], function(require, exports) {
         function Bullet(position, speed) {
             if (typeof speed === "undefined") { speed = -2; }
             this.color = "#fff";
-            this.DefaultMovementSpeed = 40;
+            this.DefaultSlowMovementSpeed = 2;
+            this.DefaultMediumMovementSpeed = 4;
+            this.DefaultFastMovementSpeed = 6;
             this.width = 3;
             this.height = 3;
             this.xVelocity = 0;
-            this.yVelocity = -80;
+            this.yVelocity = 0;
             this.active = true;
             this.x = position.x;
             this.y = position.y;
@@ -93,32 +104,64 @@ define(["require", "exports"], function(require, exports) {
     })();
     exports.Star = Star;    
     var Enemy = (function () {
-        function Enemy(x, y, color) {
-            this.health = 1;
-            this.DefaultMovementSpeed = 5;
+        function Enemy(x, y) {
+            this.DefaultSlowMovementSpeed = 3;
+            this.DefaultMediumMovementSpeed = 6;
+            this.DefaultFastMovementSpeed = 10;
+            this.DefaultProjectitleSpeed = 4;
             this.active = true;
             this.xVelocity = 10;
             this.yVelocity = 0;
             this.width = 20;
             this.height = 10;
-            this.color = "#0F9";
+            this.probabilityOfShooting = 0.001;
             this.x = x;
             this.y = y;
-            this.color = color;
         }
-        Enemy.BOSS_color = "#0F0";
-        Enemy.GRUNT_color = "#0F9";
         Enemy.prototype.draw = function (canvas) {
-            canvas.fillStyle = this.color;
+            canvas.fillStyle = this.BasicColor;
             canvas.fillRect(this.x, this.y, this.width, this.height);
+        };
+        Enemy.prototype.midpoint = function () {
+            return {
+                x: this.x + this.width / 2,
+                y: this.y + this.height / 2
+            };
+        };
+        Enemy.prototype.shoot = function () {
+            var bulletPosition = this.midpoint();
+            return new Bullet(bulletPosition, this.DefaultProjectitleSpeed);
         };
         Enemy.prototype.explode = function () {
             this.active = false;
         };
         Enemy.prototype.update = function (elapsedUnit) {
+            this.x += this.xVelocity * elapsedUnit;
         };
         return Enemy;
     })();
     exports.Enemy = Enemy;    
+    var EnemyGrunt = (function (_super) {
+        __extends(EnemyGrunt, _super);
+        function EnemyGrunt(x, y) {
+                _super.call(this, x, y);
+            this.BasicColor = "#0F9";
+            this.probabilityOfShooting = 0.001;
+            this.health = 1;
+        }
+        return EnemyGrunt;
+    })(Enemy);
+    exports.EnemyGrunt = EnemyGrunt;    
+    var EnemyBoss = (function (_super) {
+        __extends(EnemyBoss, _super);
+        function EnemyBoss(x, y) {
+                _super.call(this, x, y);
+            this.BasicColor = "RED";
+            this.probabilityOfShooting = 0.003;
+            this.health = 3;
+        }
+        return EnemyBoss;
+    })(Enemy);
+    exports.EnemyBoss = EnemyBoss;    
 })
 //@ sourceMappingURL=GameObjects.js.map

@@ -9,6 +9,7 @@ define(["require", "exports", "GameObjects", "Common"], function(require, export
             this.FPS = 10;
             this.enemies = [];
             this.playerBullets = [];
+            this.enemyBulletsSideA = [];
             this.player = new GameObjects.Player();
             this.canvas = document.getElementById('canvas');
             this.playBaseHeight = 20;
@@ -36,6 +37,7 @@ define(["require", "exports", "GameObjects", "Common"], function(require, export
             this.updateEnemies(elapsedReduced);
             this.handleCollisions();
             this.draw();
+            this.updateStats();
         };
         Game.prototype.onKeyDown = function (evt) {
             if(evt.keyCode == Common.KEYS.RIGHT) {
@@ -89,9 +91,9 @@ define(["require", "exports", "GameObjects", "Common"], function(require, export
             for(var i = 0; i <= 6; i++) {
                 for(var j = 0; j <= 3; j++) {
                     if(j == 0) {
-                        var enemy = new GameObjects.Enemy(10 + (i * 34), 40 + (j * 25), GameObjects.Enemy.BOSS_color);
+                        var enemy = new GameObjects.EnemyBoss(10 + (i * 34), 40 + (j * 25));
                     } else {
-                        var enemy = new GameObjects.Enemy(10 + (i * 34), 40 + (j * 25), GameObjects.Enemy.BOSS_color);
+                        enemy = new GameObjects.EnemyGrunt(10 + (i * 34), 40 + (j * 25));
                     }
                     this.addEnemy(enemy);
                 }
@@ -127,6 +129,11 @@ define(["require", "exports", "GameObjects", "Common"], function(require, export
                     }
                 });
             });
+            self.enemyBulletsSideA.forEach(function (bullet) {
+                if(self.collides(bullet, self.player)) {
+                    self.player.explode();
+                }
+            });
         };
         Game.prototype.draw = function () {
             this.drawBackground();
@@ -138,6 +145,10 @@ define(["require", "exports", "GameObjects", "Common"], function(require, export
             this.playerBullets.forEach(function (thing) {
                 thing.draw(that.context2D);
             });
+            this.enemyBulletsSideA.forEach(function (thing) {
+                thing.draw(that.context2D);
+            });
+            this.drawStats(this.context2D);
         };
         Game.prototype.willAtLeastOneEmemyLeaveBoundsOnNextUpdate = function () {
             for(var i = 0; i < this.enemies.length; i++) {
@@ -149,14 +160,17 @@ define(["require", "exports", "GameObjects", "Common"], function(require, export
         };
         Game.prototype.updateEnemies = function (elapsedUnit) {
             var self = this;
-            this.enemies = this.enemies.filter(function (enemy) {
+            self.enemies = self.enemies.filter(function (enemy) {
                 return enemy.active;
             });
-            if(this.willAtLeastOneEmemyLeaveBoundsOnNextUpdate()) {
-                this.reverseEnemyWaveAndDropDown();
+            if(self.willAtLeastOneEmemyLeaveBoundsOnNextUpdate()) {
+                self.reverseEnemyWaveAndDropDown();
             }
-            this.enemies.forEach(function (enemy) {
-                enemy.x += enemy.xVelocity * elapsedUnit;
+            self.enemies.forEach(function (enemy) {
+                enemy.update(elapsedUnit);
+                if(Math.random() < enemy.probabilityOfShooting) {
+                    self.enemyBulletsSideA.push(enemy.shoot());
+                }
             });
         };
         Game.prototype.updatePlayer = function (elapsedTime) {
@@ -177,6 +191,9 @@ define(["require", "exports", "GameObjects", "Common"], function(require, export
             this.playerBullets.forEach(function (bullet) {
                 bullet.update(elapsedUnit);
             });
+            this.enemyBulletsSideA.forEach(function (bullet) {
+                bullet.update(elapsedUnit);
+            });
         };
         Game.prototype.addEvent = function (obj, type, fn) {
             obj.addEventListener(type, fn, false);
@@ -192,6 +209,11 @@ define(["require", "exports", "GameObjects", "Common"], function(require, export
                 draw: 0,
                 frame: 0
             };
+        };
+        Game.prototype.updateStats = function (update, draw) {
+        };
+        Game.prototype.drawStats = function (ctx) {
+            ctx.fillStyle = 'white';
         };
         Game.prototype.loadImages = function (sources, callback) {
             var images = {

@@ -1,8 +1,6 @@
-This game aimed to be a multi-player js game (written in Typescript )with the idea of multiple people playing at once. If your a complete beginner to Typescript
-you get Steve Fentons book on Typescript.
+This game aimed to be a multi-player js game (written in Typescript )with the idea of multiple people playing at once. If you are complete beginner to Typescript, I reccomend you get Steve Fentons book on Typescript.
 
-Presently the Canvas using block graphics to help people just see clearly the bounds of objects and stuff. I'll leave fancy Graphics to other contributor's. Feel free to Fork the project on
-my githup account.
+Presently the Canvas is using block graphics to help people (and myself) just see clearly the bounds of objects and stuff. Feel free to Fork the project on my githup account.
 
 //todo 
 
