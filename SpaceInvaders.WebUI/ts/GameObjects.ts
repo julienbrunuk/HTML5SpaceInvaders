@@ -66,18 +66,18 @@ export class Player implements GameObject, MovementGameObject {
         var bulletPosition = this.midpoint();
         return new Bullet(bulletPosition, -4);
 
-    };
+    }
 
-     midpoint() {
+    midpoint() {
         return {
             x: this.x + this.width / 2,
             y: this.y + this.height / 2
         };
-    };
-        //todo
-       explode() {
+    }
+    //todo
+    explode() {
         this.color = "#F00";
-    };
+    }
 
 };
 
@@ -97,7 +97,7 @@ export class Bullet implements GameObject, MovementGameObject {
     xVelocity: number = 0;
     yVelocity: number = 0;
 
-    active: bool = true;
+    active: boolean = true;
 
     constructor(position, speed: number = -2) {
         this.x = position.x;
@@ -109,18 +109,18 @@ export class Bullet implements GameObject, MovementGameObject {
         //return this.x >= 0 && this.x <=Game.CANVAS_WIDTH &&
         //    this.y >= 0 && this.y <= CANVAS_HEIGHT;
         return true;
-    };
+    }
 
     draw(canvas: CanvasRenderingContext2D) {
         canvas.fillStyle = this.color;
         canvas.fillRect(this.x, this.y, this.width, this.height);
-    };
+    }
 
-  update(elapsedUnit) {
+    update(elapsedUnit) {
         this.x += this.xVelocity * elapsedUnit;
         this.y += this.yVelocity * elapsedUnit;
         this.active = this.active && this.inBounds();
-    };
+    }
 
 
 
@@ -131,7 +131,7 @@ export class Star implements GameObject {
     x: number;
     y: number;
     radius: number;
-    twinkles: bool = false;        //changes colour
+    twinkles: boolean = false;        //changes colour
 
     constructor(x: number, y: number) {
         this.x = x;
@@ -146,13 +146,13 @@ export class Star implements GameObject {
         context.beginPath();
         context.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
         context.fill();
-    };
+    }
 
-  update() {
+    update() {
         if (this.twinkles) {
 
         }
-    };
+    }
 }
 
 export class Enemy implements GameObject, MovementGameObject {
@@ -166,7 +166,7 @@ export class Enemy implements GameObject, MovementGameObject {
     DefaultFastMovementSpeed: number = 10;
 
     DefaultProjectitleSpeed: number = 4;
-    active: bool = true;
+    active: boolean = true;
 
     xVelocity: number = 10;
     yVelocity: number = 0;
@@ -185,38 +185,38 @@ export class Enemy implements GameObject, MovementGameObject {
     draw(canvas: CanvasRenderingContext2D) {
         canvas.fillStyle = this.BasicColor;
         canvas.fillRect(this.x, this.y, this.width, this.height);
-    };
+    }
 
     midpoint() {
         return {
             x: this.x + this.width / 2,
             y: this.y + this.height / 2
         };
-    };
+    }
 
     shoot() {
         // todo Sound.play("shoot");
         var bulletPosition = this.midpoint();
         return new Bullet(bulletPosition, this.DefaultProjectitleSpeed);
-    };
+    }
 
     explode() {
         this.active = false;
         // todo boom graphic
-    };
+    }
 
-  update(elapsedUnit) {
+    update(elapsedUnit) {
         this.x += this.xVelocity * elapsedUnit;
         //this.x += this.xVelocity;
         //this.y += this.yVelocity;
         //   this.active = this.active && this.inBounds();
-    };
+    }
 }
 
 export class EnemyGrunt extends Enemy {
 
     constructor(x: number, y: number) {
-        super(x,y);
+        super(x, y);
         this.BasicColor = "#0F9";
         this.probabilityOfShooting = 0.001;
         this.health = 1;

@@ -5,8 +5,8 @@
 ///<reference path="d.ts/GameObjects.ts/>
 ///<reference path="Common.ts/>
 
-import GameObjects = module("GameObjects")
-import Common = module("Common")
+import GameObjects = require("GameObjects")
+import Common = require("Common")
 
 //to get ts to compile
 interface Object {
@@ -41,28 +41,39 @@ class Game {
     stars = [];
 
     //for the key events
-    rightDown: bool = false;
-    leftDown: bool = false;
-    space: bool = false;
+    rightDown: boolean = false;
+    leftDown: boolean = false;
+    space: boolean = false;
 
-    lastDate: Date = new Date();
+    lastFrame: number = 0;
     //elapsedTime: number;
 
     update() {
-        var newDate: Date = new Date();
-        var elapsedTime: number = newDate.getTime() - this.lastDate.getTime();
 
-        var elapsedReduced: number = (elapsedTime / 10000) * Common.GAME_DEFAULTS.GAME_SPEED; // the elapsed time in ms is way to big for rendering to the canvas
+        var start = this.timestamp();
+        var elapsedTime: number = start - this.lastFrame;
+    var elapsedReduced: number = (elapsedTime / 1000.0); // send dt as seconds
 
-        this.lastDate = newDate;
+    
 
         this.updateBullets(elapsedReduced);
         this.updatePlayer(elapsedReduced);
         this.updateEnemies(elapsedReduced);
         this.handleCollisions();
-        this.draw();
 
-        this.updateStats();
+        var middle = this.timestamp();
+
+        this.draw();
+        var end = this.timestamp();
+
+
+        this.updateStats(middle - start, end - middle);
+        this.lastFrame = start;
+        
+    }
+
+    timestamp():number {
+        return new Date().getTime();
     }
 
     constructor() {
@@ -203,7 +214,7 @@ class Game {
 
     }
 
-    willAtLeastOneEmemyLeaveBoundsOnNextUpdate(): bool {
+    willAtLeastOneEmemyLeaveBoundsOnNextUpdate(): boolean {
         for (var i = 0; i < this.enemies.length; i++) {
             if ((this.enemies[i].x <= 0 || this.enemies[i].x >= Game.CANVAS_WIDTH - this.enemies[i].width)) {
                 return true;
@@ -278,7 +289,7 @@ class Game {
 
     //_______________________________________________________________________________todo remove this in prod
     updateStats(update, draw) {
-        //this.stats.update = Math.max(1, update);
+        this.stats.update = Math.max(1, update);
         //this.stats.draw = Math.max(1, draw);
         //this.stats.frame = this.stats.update + this.stats.draw;
         //this.stats.count = this.stats.count == this.FPS ? 0 : this.stats.count + 1;
