@@ -6,5 +6,5 @@ Presently the Canvas is using block graphics to help people (and myself) just se
 
 //todo 
 
-1 Get a node.js server running with the Games world variables.
-2 Get the web clinets playing the game of the node server in a high performance, low latency manner
+1 Get game working with clientside WebRTC and have a node.js handshaker server running.
+2 Decide if I need an authoritive server to stop clinet side cheating.
