@@ -1,0 +1,26 @@
+{
+  "name": "HTML5SpaceInvaders",
+  "version": "0.0.1",
+  "homepage": "https://github.com/QuantumInformation/HTML5SpaceInvaders",
+  "authors": [
+    "Nikos katsikanis <nkatsikanis@gmail.com>"
+  ],
+  "main": "index.js",
+  "moduleType": [
+    "es6",
+    "node"
+  ],
+  "keywords": [
+    "test"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "app/bower_components",
+    "test",
+    "tests"
+  ]
+}
