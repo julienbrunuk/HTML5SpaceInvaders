@@ -1,0 +1,38 @@
+{
+  "name": "HTML5SpaceInvaders",
+  "version": "0.0.1",
+  "description": "HTML5SpaceInvaders game based on es6 and webRTC",
+  "main": "index.js",
+  "scripts": {
+    "test": "test game"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/QuantumInformation/HTML5SpaceInvaders.git"
+  },
+  "dependencies": {
+    "debug": ""
+  },
+  "devDependencies": {
+    "tape": "^2.13.3",
+    "gulp": "",
+    "gulp-jshint": "^1.7.1",
+    "traceur": "0.0.51"
+  },
+  "keywords": [
+    "Canvas",
+    "HTML5",
+    "webRTC",
+    "game"
+  ],
+  "author": "Nikos Katsikanis",
+  "license": "ISC",
+  "contributors": [
+    "Nikos Katsikanis",
+    "Julien Brun"
+  ],
+  "bugs": {
+    "url": "https://github.com/QuantumInformation/HTML5SpaceInvaders/issues"
+  },
+  "homepage": "https://github.com/QuantumInformation/HTML5SpaceInvaders"
+}
