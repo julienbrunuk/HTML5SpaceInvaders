@@ -1,9 +1,6 @@
-///<reference path="d.ts/lib.d.ts" />
-
-///<reference path="d.ts/jquery-1.8.d.ts" />
-///<reference path="../javascripts/jquery-1.8.2.js/>
-///<reference path="d.ts/GameObjects.ts/>
-///<reference path="Common.ts/>
+///<reference path="./d.ts/lib.d.ts" />
+///<reference path="./GameObjects.ts"/>
+///<reference path="./Common.ts"/>
 
 import GameObjects = require("GameObjects")
 import Common = require("Common")
@@ -323,16 +320,17 @@ class Game {
 }
 
 //normal js stuff
-$(document).ready(function () {
+//$(document).ready(function () {
     var game: Game = new Game();
     //game.handleCollisions.bind(game);
-    $(document).keydown(game.onKeyDown.bind(game));
-    $(document).keyup(game.onKeyUp.bind(game));
+    window.document.addEventListener("keydown",(game.onKeyDown.bind(game)));
+    window.document.addEventListener("keyup",(game.onKeyUp.bind(game)));
+    //$(document).keyup(game.onKeyUp.bind(game));
     setInterval(function () {
 
 
         game.update();
         game.draw();
-    }, 1000 / this.FPS);
-});
+    }, 1000 / game.FPS);
+//});
 

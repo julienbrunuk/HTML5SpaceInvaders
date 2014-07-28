@@ -12,5 +12,5 @@ Presently the Canvas is using block graphics to help people (and myself) just se
 
 ###TODO
 
-1 Get game working with clientside WebRTC and have a node.js handshaker server running.
-2 Decide if I need an authoritive server to stop client side cheating.
+* Get game working with clientside WebRTC and have a node.js handshaker server running.
+* Decide if I need an authoritive server to stop client side cheating.
