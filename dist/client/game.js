@@ -1,4 +1,4 @@
-///<reference path="./d.ts/lib.d.ts" />
+///<reference path="./../d.ts/lib.d.ts" />
 ///<reference path="./GameObjects.ts"/>
 ///<reference path="./Common.ts"/>
 define(["require", "exports", "GameObjects", "Common"], function(require, exports, GameObjects, Common) {
@@ -302,3 +302,4 @@ define(["require", "exports", "GameObjects", "Common"], function(require, export
     }, 1000 / game.FPS);
 });
 //});
+//# sourceMappingURL=game.js.map

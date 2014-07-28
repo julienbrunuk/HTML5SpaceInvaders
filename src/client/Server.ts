@@ -1,4 +1,4 @@
-///<reference path="d.ts/node.d.ts" />
+///<reference path="../d.ts/node.d.ts" />
 
 var url = require('url'),
     path = require('path'),

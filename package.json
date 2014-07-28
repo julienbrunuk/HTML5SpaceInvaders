@@ -17,8 +17,8 @@
     "tape": "^2.13.3",
     "gulp": "",
     "gulp-jshint": "^1.7.1",
-    "es6-shim": "^0.14.0",
-    "gulp-typescript": "^0.3.1"
+    "gulp-tsc": "^0.9.2",
+    "gulp-typescript-compiler": "^1.0.1"
   },
   "keywords": [
     "Canvas",

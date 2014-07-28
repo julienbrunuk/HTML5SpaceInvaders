@@ -1,11 +1,11 @@
-///<reference path="./d.ts/lib.d.ts" />
+///<reference path="./../d.ts/lib.d.ts" />
 ///<reference path="./GameObjects.ts"/>
 ///<reference path="./Common.ts"/>
 
 import GameObjects = require("GameObjects")
 import Common = require("Common")
 
-//to get ts to compile
+//to get src to compile
 interface Object {
     extend(destination, source): any;
     construct(base): any;
