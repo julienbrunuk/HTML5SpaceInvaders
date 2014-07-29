@@ -13,6 +13,10 @@
   "keywords": [
     "test"
   ],
+	"dependencies": {
+		"angular":"",
+		"bootstrap":""
+},
   "license": "MIT",
   "private": true,
   "ignore": [
@@ -24,3 +28,5 @@
     "tests"
   ]
 }
+
+

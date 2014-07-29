@@ -14,11 +14,15 @@
     "debug": ""
   },
   "devDependencies": {
-    "tape": "^2.13.3",
+
     "gulp": "",
     "gulp-jshint": "^1.7.1",
-    "gulp-tsc": "^0.9.2",
-    "gulp-typescript-compiler": "^1.0.1"
+    "gulp-typescript-compiler": "^1.0.1",
+    "gulp-jade": "^0.7.0",
+		"karma": "^0.12.1",
+		"karma-jasmine": "^0.1.5",
+		"karma-chrome-launcher": "^0.1.2",
+		"tape": "^2.13.3"
   },
   "keywords": [
     "Canvas",

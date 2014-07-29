@@ -1,0 +1,11 @@
+doctype html
+html
+    head
+        title Space Invaders
+        script(language='javascript', src='javascripts/require.js', type='text/javascript', data-main='ts/game.js')
+    body(ng-controller="UICtrl")
+        h1 Co-op space invadors
+        script(type='text/javascript')
+        canvas#canvas
+        p Keys:  Arrows = movment, Space = shoot
+        button(ng-click="startGame") start
