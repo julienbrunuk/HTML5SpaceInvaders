@@ -1,4 +1,4 @@
-///<reference path="Main.ts" />
+///<reference path="Game.ts" />
 
 
 export interface GameObject {

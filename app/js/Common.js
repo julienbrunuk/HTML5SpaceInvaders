@@ -27,7 +27,7 @@ define(["require", "exports"], function(require, exports) {
 
     //think of these speeds as relative speeds t
     exports.GAME_DEFAULTS = {
-        GAME_SPEED: 1000
+        GAME_SPEED: 50
     };
 
     /**

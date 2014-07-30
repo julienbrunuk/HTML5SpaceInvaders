@@ -13,10 +13,12 @@
   "keywords": [
     "test"
   ],
-	"dependencies": {
-		"angular":"",
-		"bootstrap":""
-},
+  "dependencies": {
+    "angular": "",
+    "requirejs": "~2.1.8",
+    "bootstrap": "",
+    "polymer": "Polymer/polymer#~0.3.4"
+  },
   "license": "MIT",
   "private": true,
   "ignore": [
@@ -28,5 +30,3 @@
     "tests"
   ]
 }
-
-

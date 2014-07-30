@@ -26,7 +26,7 @@ export var KEYS = {
 
 //think of these speeds as relative speeds t
 export var GAME_DEFAULTS = {
-    GAME_SPEED: 1000 // the higher the number the faster the game will run
+    GAME_SPEED: 50 // the higher the number the faster the game will run
 }
 
 /**

@@ -4,7 +4,7 @@ var jade = require('gulp-jade');
 var tsc = require('gulp-typescript-compiler');
 
 var FOLDERS = {};
-FOLDERS.CLIENT_TS_ROOT = 'app/ts';
+//FOLDERS.CLIENT_TS_ROOT = 'app/ts';
 FOLDERS.CLIENT_JS_ROOT = 'app/js';
 FOLDERS.CLIENT_JADE_ROOT = 'app';
 FOLDERS.SERVER_TYPESCRIPT_ROOT = 'server/ts';
@@ -38,9 +38,9 @@ gulp.task('jade', function () {
 gulp.task('tsc', function () {
 
 	//client
-	gulp.src([FOLDERS.CLIENT_TS_ROOT + '/*.ts'])
+	gulp.src([FOLDERS.CLIENT_JS_ROOT + '/*.ts'])
 		//.pipe(tsc({ sourcemap: true,  module: 'amd',outDir: 'dist/client/'}))
-		.pipe(tsc())
+		.pipe(tsc({outDir: 'dist/client/'}))
 		.pipe(gulp.dest(FOLDERS.CLIENT_JS_ROOT));
 
 	//server

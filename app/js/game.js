@@ -7,12 +7,13 @@ define(["require", "exports", "GameObjects", "Common"], function(require, export
     var Game = (function () {
         function Game() {
             this.NUMBER_OF_STARS = 50;
-            this.FPS = 10;
+            this.FPS = 545;
             this.enemies = [];
             this.playerBullets = [];
             this.enemyBulletsSideA = [];
             this.player = new GameObjects.Player();
             this.canvas = document.getElementById('canvas');
+            this.stats = { count: 0 };
             //background scenery objects
             this.playBaseHeight = 20;
             this.playBaseColor = "blue";
@@ -22,18 +23,17 @@ define(["require", "exports", "GameObjects", "Common"], function(require, export
             this.rightDown = false;
             this.leftDown = false;
             this.space = false;
-            this.lastFrame = 0;
+            this.lastFrame = this.timestamp();
             this.context2D = this.canvas.getContext("2d");
             this.canvas.width = Game.CANVAS_WIDTH;
             this.canvas.height = Game.CANVAS_HEIGHT;
-
             this.initGame();
         }
         //elapsedTime: number;
         Game.prototype.update = function () {
             var start = this.timestamp();
             var elapsedTime = start - this.lastFrame;
-            var elapsedReduced = (elapsedTime / 1000.0);
+            var elapsedReduced = (elapsedTime / 1000.0) * Common.GAME_DEFAULTS.GAME_SPEED;
 
             this.updateBullets(elapsedReduced);
             this.updatePlayer(elapsedReduced);
@@ -251,17 +251,18 @@ define(["require", "exports", "GameObjects", "Common"], function(require, export
         //_______________________________________________________________________________todo remove this in prod
         Game.prototype.updateStats = function (update, draw) {
             this.stats.update = Math.max(1, update);
-            //this.stats.draw = Math.max(1, draw);
-            //this.stats.frame = this.stats.update + this.stats.draw;
-            //this.stats.count = this.stats.count == this.FPS ? 0 : this.stats.count + 1;
-            //this.stats.fps = Math.min(this.FPS, 1000 / this.stats.frame);
+            this.stats.draw = Math.max(1, draw);
+            this.stats.frame = this.stats.update + this.stats.draw;
+            this.stats.count = this.stats.count + 1;
+            this.stats.fps = Math.min(this.FPS, 1000 / this.stats.frame);
         };
+
         Game.prototype.drawStats = function (ctx) {
             ctx.fillStyle = 'white';
-            //ctx.fillText("frame: " + Math.round(this.stats.count), Game.CANVAS_WIDTH - 100, Game.CANVAS_HEIGHT - 60);
-            //ctx.fillText("fps: " + Math.round(this.stats.fps), Game.CANVAS_WIDTH - 100, Game.CANVAS_HEIGHT - 50);
-            //ctx.fillText("update: " + Math.round(this.stats.update) + "ms", Game.CANVAS_WIDTH - 100, Game.CANVAS_HEIGHT - 40);
-            //ctx.fillText("draw: " + Math.round(this.stats.draw) + "ms", Game.CANVAS_WIDTH - 100, Game.CANVAS_HEIGHT - 30);
+            ctx.fillText("frame: " + Math.round(this.stats.count), Game.CANVAS_WIDTH - 100, Game.CANVAS_HEIGHT - 60);
+            ctx.fillText("fps: " + Math.round(this.stats.fps), Game.CANVAS_WIDTH - 100, Game.CANVAS_HEIGHT - 50);
+            ctx.fillText("update: " + Math.round(this.stats.update) + "ms", Game.CANVAS_WIDTH - 100, Game.CANVAS_HEIGHT - 40);
+            ctx.fillText("draw: " + Math.round(this.stats.draw) + "ms", Game.CANVAS_WIDTH - 100, Game.CANVAS_HEIGHT - 30);
         };
 
         Game.prototype.loadImages = function (sources, callback) {
@@ -286,7 +287,7 @@ define(["require", "exports", "GameObjects", "Common"], function(require, export
         Game.CANVAS_HEIGHT = 600;
         return Game;
     })();
-
+    exports.Game = Game;
 });
 //});
-//# sourceMappingURL=game.js.map
+//# sourceMappingURL=Game.js.map
