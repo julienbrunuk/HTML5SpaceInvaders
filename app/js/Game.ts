@@ -93,8 +93,8 @@ export class Game {
     }
 
     initGame() {
-        this.player.x = 0;
-        this.player.y = Game.CANVAS_HEIGHT - this.playBaseHeight - this.player.height;
+        this.player.position.x = 0;
+        this.player.position.y = Game.CANVAS_HEIGHT - this.playBaseHeight - this.player.height;
         this.player.OnShoot = function (bullet:GameObjects.Bullet) {
             this.playerBullets.push(bullet);
         }
@@ -148,8 +148,8 @@ export class Game {
     reverseEnemyWaveAndDropDown() {
         this.enemies.forEach(function (enemy:GameObjects.Enemy) {
             //moving to the right
-            enemy.xVelocity = enemy.xVelocity * -1;
-            enemy.y += enemy.height;
+            enemy.vector.xVelocity = enemy.vector.xVelocity * -1;
+            enemy.position.y += enemy.dimensions.height;
         });
     }
 

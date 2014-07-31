@@ -1,150 +1,96 @@
-///<reference path="Game.ts" />
+///<reference path="Common.ts" />
+
+import Common = require("Common");
 
 
-export interface GameObject {
+export class Player implements GameObject {
 
-    draw(canvas: CanvasRenderingContext2D);
-    update(elapsedUnit: number);
+    color:string = "#F0A";
 
-}
-export interface MovementGameObject {
+    position:CartesianCoordinate;
+    dimensions:Dimensions_2D;
+    vector:Vector_2D;
 
+    DefaultMovementSpeed:number = 10;
 
-    DefaultSlowMovementSpeed: number;
-    DefaultMediumMovementSpeed: number;
-    DefaultFastMovementSpeed: number;
-
-}
-
-export class Player implements GameObject, MovementGameObject {
-
-    color: string = "#F0A";
-
-    x: number;
-    y: number;
-
-    DefaultMovementSpeed: number = 10;
-
-    DefaultSlowMovementSpeed: number = 5;
-    DefaultMediumMovementSpeed: number = 8;
-    DefaultFastMovementSpeed: number = 11;
-
-    xVelocity: number = 0;
+    xVelocity:number = 0;
     //never used
-    yVelocity: number = 0;
+    yVelocity:number = 0;
 
-    width: number = 20;
-    height: number = 30;
-
-    public OnShoot: Function;
+    width:number = 20;
+    height:number = 30;
+    currentWeapon:Bullet;
+    public OnShoot:Function;
 
     constructor() {
     }
 
-    draw(context2D: CanvasRenderingContext2D) {
+    draw(context2D:CanvasRenderingContext2D) {
         context2D.fillStyle = this.color;
-        context2D.fillRect(this.x, this.y, this.width, this.height);
+        context2D.fillRect(this.position.x, this.position.y, this.width, this.height);
+        context2D.fillRect(this.position.x, this.position.y, this.dimensions.width, this.dimensions.height);
+
     }
 
     update(elapsedUnit) {
-        this.x += this.xVelocity * elapsedUnit;
+        this.position.x+= this.xVelocity * elapsedUnit;
     }
 
-    clamp(gameWidth: number) {
-        if (this.x < 0) {
-            this.x = 0;
+    clamp(gameWidth:number) {
+        if (this.position.x< 0) {
+            this.position.x= 0;
             return;
         }
-        else if (this.x > (gameWidth - this.width)) {
-            this.x = gameWidth - this.width;
+        else if (this.position.x> (gameWidth - this.width)) {
+            this.position.x= gameWidth - this.width;
             return;
         }
     }
 
     shoot() {
         // todo Sound.play("shoot");
-        var bulletPosition = this.midpoint();
-        return new Bullet(bulletPosition, -4);
+        var bulletPosition:CartesianCoordinate = this.midpoint();
+        return new TinyBullet(bulletPosition, true);
 
     }
 
     midpoint() {
-        return {
-            x: this.x + this.width / 2,
-            y: this.y + this.height / 2
-        };
+        return new CartesianCoordinate(this.position.x + this.dimensions.width / 2, this.position.y + this.dimensions.height / 2);
     }
+    
+
     //todo
     explode() {
         this.color = "#F00";
     }
 
-};
-
-export class Bullet implements GameObject, MovementGameObject {
-
-    color: string = "#fff";
-
-    x: number;
-    y: number;
-    DefaultSlowMovementSpeed: number = 2;
-    DefaultMediumMovementSpeed: number = 4;
-    DefaultFastMovementSpeed: number = 6;
-
-    width: number = 3;
-    height: number = 3;
-
-    xVelocity: number = 0;
-    yVelocity: number = 0;
-
-    active: boolean = true;
-
-    constructor(position, speed: number = -2) {
-        this.x = position.x;
-        this.y = position.y;
-        this.yVelocity = speed;
-    }
-
-    inBounds() {
-        //return this.x >= 0 && this.x <=Game.CANVAS_WIDTH &&
-        //    this.y >= 0 && this.y <= CANVAS_HEIGHT;
-        return true;
-    }
-
-    draw(canvas: CanvasRenderingContext2D) {
-        canvas.fillStyle = this.color;
-        canvas.fillRect(this.x, this.y, this.width, this.height);
-    }
-
-    update(elapsedUnit) {
-        this.x += this.xVelocity * elapsedUnit;
-        this.y += this.yVelocity * elapsedUnit;
-        this.active = this.active && this.inBounds();
-    }
-
-
-
 }
-export class Star implements GameObject {
-    static MAX_RADIUS: number = 3;
-    color: string = "white";
-    x: number;
-    y: number;
-    radius: number;
-    twinkles: boolean = false;        //changes colour
+;
 
-    constructor(x: number, y: number) {
-        this.x = x;
-        this.y = y;
+
+export class Star implements GameObject {
+    static MAX_RADIUS:number = 3;
+    color:string = "white";
+    position:CartesianCoordinate;
+
+
+    radius:number;
+    twinkles:boolean = false;        //changes colour
+
+    constructor(position:CartesianCoordinate) {
+        this.position.x= position.x;
+        this.position.y= position.y;
         this.radius = Math.round(Math.random() * Star.MAX_RADIUS);
         //10% chance
         this.twinkles = (Math.random() > 0.9);
     }
 
-    draw(context: CanvasRenderingContext2D) {
+    draw(context:CanvasRenderingContext2D) {
         context.fillStyle = "#aaa";
         context.beginPath();
-        context.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
+        context.arc(this.position.x, this.position.y, this.radius, 0, 2 * Math.PI, false);
+
+
         context.fill();
     }
 
@@ -155,50 +101,36 @@ export class Star implements GameObject {
     }
 }
 
-export class Enemy implements GameObject, MovementGameObject {
-    health: number;
+export class Enemy implements GameObject {
+    health:number;
 
-    x: number;
-    y: number;
+    position:CartesianCoordinate;
+    dimensions:Dimensions_2D;
+    vector:Vector_2D;
 
-    DefaultSlowMovementSpeed: number = 3;
-    DefaultMediumMovementSpeed: number = 6;
-    DefaultFastMovementSpeed: number = 10;
+    DefaultProjectitleSpeed:number = 4;
+    active:boolean = true;
 
-    DefaultProjectitleSpeed: number = 4;
-    active: boolean = true;
 
-    xVelocity: number = 10;
-    yVelocity: number = 0;
-    width: number = 20;
-    height: number = 10;
+    probabilityOfShooting:number = 0.001;
 
-    probabilityOfShooting: number = 0.001;
+    BasicColor:string;
 
-    BasicColor: string;
-
-    constructor(x: number, y: number) {
-        this.x = x;
-        this.y = y;
+    constructor(x:number, y:number) {
+        this.position.x = x;
+        this.position.y = y;
     }
 
-    draw(canvas: CanvasRenderingContext2D) {
+    draw(canvas:CanvasRenderingContext2D) {
         canvas.fillStyle = this.BasicColor;
-        canvas.fillRect(this.x, this.y, this.width, this.height);
+        canvas.fillRect(this.position.x, this.position.y, this.dimensions.width, this.dimensions.height);
     }
+
 
     midpoint() {
-        return {
-            x: this.x + this.width / 2,
-            y: this.y + this.height / 2
-        };
+        return new CartesianCoordinate(this.position.x + this.dimensions.width / 2, this.position.y + this.dimensions.height / 2);
     }
 
-    shoot() {
-        // todo Sound.play("shoot");
-        var bulletPosition = this.midpoint();
-        return new Bullet(bulletPosition, this.DefaultProjectitleSpeed);
-    }
 
     explode() {
         this.active = false;
@@ -206,29 +138,41 @@ export class Enemy implements GameObject, MovementGameObject {
     }
 
     update(elapsedUnit) {
-        this.x += this.xVelocity * elapsedUnit;
-        //this.x += this.xVelocity;
-        //this.y += this.yVelocity;
+        this.position.x += this.vector.xVelocity * elapsedUnit;
+        //this.position.x+= this.xVelocity;
+        //this.position.y+= this.yVelocity;
         //   this.active = this.active && this.inBounds();
     }
 }
 
 export class EnemyGrunt extends Enemy {
 
-    constructor(x: number, y: number) {
+    constructor(x:number, y:number) {
         super(x, y);
         this.BasicColor = "#0F9";
         this.probabilityOfShooting = 0.001;
         this.health = 1;
     }
+
+    shoot() {
+        // todo Sound.play("shoot");
+        var bulletPosition:CartesianCoordinate = this.midpoint();
+        return new TinyBullet(bulletPosition, false);
+    }
 }
 
 export class EnemyBoss extends Enemy {
 
-    constructor(x: number, y: number) {
+    constructor(x:number, y:number) {
         super(x, y);
         this.BasicColor = "RED";
         this.probabilityOfShooting = 0.003;
         this.health = 3;
+    }
+
+    shoot() {
+        // todo Sound.play("shoot");
+        var bulletPosition:CartesianCoordinate = this.midpoint();
+        return new LargeBullet(bulletPosition, false);
     }
 }

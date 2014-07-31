@@ -29,6 +29,46 @@ export var GAME_DEFAULTS = {
     GAME_SPEED: 50 // the higher the number the faster the game will run
 }
 
+export interface GameObject {
+
+    draw(canvas:CanvasRenderingContext2D);
+    update(elapsedUnit:number);
+
+}
+
+export class CartesianCoordinate {
+    x:number ;
+    y:number ;
+    constructor(x:number, y:number) {
+        this.x = x;
+        this.y = y;
+    }
+
+}
+export class Dimensions_2D{
+    width:number ;
+    height:number ;
+    constructor(width:number, height:number) {
+        this.width = width;
+        this.height = height;
+    }
+}
+
+//todo create 3D vector if game will be ported to WebGl
+/**
+ * signifies movement in 3D
+ */
+
+export class Vector_2D{
+    xVelocity:number = 0; //by default bullets go straight down
+    yVelocity:number; // depends on the type of bullet class
+
+    constructor(xVelocity:number, yVelocity:number) {
+        this.xVelocity = xVelocity;
+        this.yVelocity = yVelocity;
+    }
+}
+
 /**
  * Returns a number whose value is limited to the given range.
  *

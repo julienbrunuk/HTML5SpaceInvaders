@@ -12,9 +12,6 @@ define(["require", "exports"], function(require, exports) {
         function Player() {
             this.color = "#F0A";
             this.DefaultMovementSpeed = 10;
-            this.DefaultSlowMovementSpeed = 5;
-            this.DefaultMediumMovementSpeed = 8;
-            this.DefaultFastMovementSpeed = 11;
             this.xVelocity = 0;
             //never used
             this.yVelocity = 0;
@@ -43,7 +40,7 @@ define(["require", "exports"], function(require, exports) {
         Player.prototype.shoot = function () {
             // todo Sound.play("shoot");
             var bulletPosition = this.midpoint();
-            return new Bullet(bulletPosition, -4);
+            return new TinyBullet(bulletPosition, -4, true);
         };
 
         Player.prototype.midpoint = function () {
@@ -65,14 +62,7 @@ define(["require", "exports"], function(require, exports) {
     var Bullet = (function () {
         function Bullet(position, speed) {
             if (typeof speed === "undefined") { speed = -2; }
-            this.color = "#fff";
-            this.DefaultSlowMovementSpeed = 2;
-            this.DefaultMediumMovementSpeed = 4;
-            this.DefaultFastMovementSpeed = 6;
-            this.width = 3;
-            this.height = 3;
             this.xVelocity = 0;
-            this.yVelocity = 0;
             this.active = true;
             this.x = position.x;
             this.y = position.y;
@@ -94,9 +84,44 @@ define(["require", "exports"], function(require, exports) {
             this.y += this.yVelocity * elapsedUnit;
             this.active = this.active && this.inBounds();
         };
+        Bullet.SLOW_MOVEMENT_SPEED = 2;
+        Bullet.MEDIUM_MOVEMENT_SPEED = 4;
+        Bullet.FAST_SLOW_MOVEMENT_SPEED = 6;
+
+        Bullet.SMALL_SIZE = 2;
+        Bullet.LARGE_SIZE = 9;
         return Bullet;
     })();
     exports.Bullet = Bullet;
+
+    var TinyBullet = (function (_super) {
+        __extends(TinyBullet, _super);
+        //Grunts usually fire this
+        function TinyBullet(x, y, isFromPlayer) {
+            _super.call(this, x, y);
+            this.yVelocity = Bullet.SLOW_MOVEMENT_SPEED;
+            this.width = Bullet.SMALL_SIZE;
+            this.height = Bullet.SMALL_SIZE;
+            this.color = "white";
+        }
+        return TinyBullet;
+    })(Bullet);
+    exports.TinyBullet = TinyBullet;
+
+    var LargeBullet = (function (_super) {
+        __extends(LargeBullet, _super);
+        //Grunts usually fire this
+        function LargeBullet(x, y) {
+            _super.call(this, x, y);
+            this.yVelocity = Bullet.FAST_SLOW_MOVEMENT_SPEED;
+            this.width = Bullet.LARGE_SIZE;
+            this.height = Bullet.LARGE_SIZE;
+            this.color = "yellow";
+        }
+        return LargeBullet;
+    })(Bullet);
+    exports.LargeBullet = LargeBullet;
+
     var Star = (function () {
         function Star(x, y) {
             this.color = "white";
@@ -126,9 +151,6 @@ define(["require", "exports"], function(require, exports) {
 
     var Enemy = (function () {
         function Enemy(x, y) {
-            this.DefaultSlowMovementSpeed = 3;
-            this.DefaultMediumMovementSpeed = 6;
-            this.DefaultFastMovementSpeed = 10;
             this.DefaultProjectitleSpeed = 4;
             this.active = true;
             this.xVelocity = 10;
@@ -149,12 +171,6 @@ define(["require", "exports"], function(require, exports) {
                 x: this.x + this.width / 2,
                 y: this.y + this.height / 2
             };
-        };
-
-        Enemy.prototype.shoot = function () {
-            // todo Sound.play("shoot");
-            var bulletPosition = this.midpoint();
-            return new Bullet(bulletPosition, this.DefaultProjectitleSpeed);
         };
 
         Enemy.prototype.explode = function () {
@@ -180,6 +196,11 @@ define(["require", "exports"], function(require, exports) {
             this.probabilityOfShooting = 0.001;
             this.health = 1;
         }
+        EnemyGrunt.prototype.shoot = function () {
+            // todo Sound.play("shoot");
+            var bulletPosition = this.midpoint();
+            return new TinyBullet(bulletPosition, this.DefaultProjectitleSpeed, false);
+        };
         return EnemyGrunt;
     })(Enemy);
     exports.EnemyGrunt = EnemyGrunt;
@@ -192,6 +213,11 @@ define(["require", "exports"], function(require, exports) {
             this.probabilityOfShooting = 0.003;
             this.health = 3;
         }
+        EnemyBoss.prototype.shoot = function () {
+            // todo Sound.play("shoot");
+            var bulletPosition = this.midpoint();
+            return new LargeBullet(bulletPosition, this.DefaultProjectitleSpeed, false);
+        };
         return EnemyBoss;
     })(Enemy);
     exports.EnemyBoss = EnemyBoss;
