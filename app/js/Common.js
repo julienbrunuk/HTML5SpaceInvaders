@@ -30,6 +30,37 @@ define(["require", "exports"], function(require, exports) {
         GAME_SPEED: 50
     };
 
+    var CartesianCoordinate = (function () {
+        function CartesianCoordinate(x, y) {
+            this.x = x;
+            this.y = y;
+        }
+        return CartesianCoordinate;
+    })();
+    exports.CartesianCoordinate = CartesianCoordinate;
+    var Dimensions_2D = (function () {
+        function Dimensions_2D(width, height) {
+            this.width = width;
+            this.height = height;
+        }
+        return Dimensions_2D;
+    })();
+    exports.Dimensions_2D = Dimensions_2D;
+
+    //todo create 3D vector if game will be ported to WebGl
+    /**
+    * signifies movement in 3D
+    */
+    var Vector_2D = (function () {
+        function Vector_2D(xVelocity, yVelocity) {
+            this.xVelocity = 0;
+            this.xVelocity = xVelocity;
+            this.yVelocity = yVelocity;
+        }
+        return Vector_2D;
+    })();
+    exports.Vector_2D = Vector_2D;
+
     /**
     * Returns a number whose value is limited to the given range.
     *

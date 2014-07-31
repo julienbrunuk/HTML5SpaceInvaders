@@ -43,7 +43,6 @@ export class CartesianCoordinate {
         this.x = x;
         this.y = y;
     }
-
 }
 export class Dimensions_2D{
     width:number ;

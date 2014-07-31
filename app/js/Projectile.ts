@@ -1,5 +1,7 @@
 ///<reference path="Game.ts" />
 
+
+import Game = require("Game");
 export class Bullet implements GameObject {
 
 
@@ -16,15 +18,13 @@ export class Bullet implements GameObject {
 
     position:CartesianCoordinate;
     dimensions:Dimensions_2D;
-    vector:Vector_2D;
+    vector:Vector_2D = new Vector_2D(0,0);
 
 
     active:boolean = true;
 
-    constructor(position, vector:Vector_2D) {
-        this.position.x = position.x;
-        this.position.y = position.y;
-        this.vector = vector;  //0 = straight
+    constructor(position:CartesianCoordinate, vector:Vector_2D) {
+        this.position=position;
     }
 
     inBounds() {
@@ -50,8 +50,7 @@ export class TinyBullet extends Bullet {
     //Grunts usually fire this
     constructor(postion:CartesianCoordinate, isFromPlayer) {
         super(postion, new Vector_2D(0, Bullet.SLOW_MOVEMENT_SPEED));
-        this.dimensions.width = Bullet.SMALL_SIZE;
-        this.dimensions.height = Bullet.SMALL_SIZE;
+        this.dimensions = new Dimensions_2D(Bullet.SMALL_SIZE,Bullet.SMALL_SIZE);
         this.color = "white";
     }
 }
@@ -61,8 +60,8 @@ export class LargeBullet extends Bullet {
     //Grunts usually fire this
     constructor(postion:CartesianCoordinate, isFromPlayer) {
         super(postion, new Vector_2D(0, Bullet.FAST_MOVEMENT_SPEED));
-        this.dimensions.width = Bullet.LARGE_SIZE;
-        this.dimensions.height = Bullet.LARGE_SIZE;
+
+        this.dimensions = new Dimensions_2D(Bullet.LARGE_SIZE,Bullet.LARGE_SIZE);
         this.color = "yellow";
     }
 }

@@ -1,9 +1,14 @@
 ///<reference path="./d.ts/lib.d.ts" />
 ///<reference path="./GameObjects.ts"/>
 ///<reference path="./Common.ts"/>
+///<reference path="./PlayerBase.ts"/>
 
 import GameObjects = require("GameObjects")
+import Base = require("PlayerBase")
+
+
 import Common = require("Common")
+CartesianCoordinate = Common.CartesianCoordinate;
 
 //to get src to compile
 interface Object {
@@ -16,23 +21,23 @@ export class Game {
     static CANVAS_HEIGHT:number = 600;
 
     NUMBER_OF_STARS:number = 50;
-    FPS:number = 545; // this will depend on latency
-
+    FPS:number = 45; // this will depend on latency
+    bases = [];
     enemies = [];
     playerBullets = [];
 
     enemyBulletsSideA = [];
 
-    player:GameObjects.Player = new GameObjects.Player();
+    player:GameObjects.Player;
 
     canvas:HTMLCanvasElement = <HTMLCanvasElement> document.getElementById('canvas');
 
     context2D:CanvasRenderingContext2D;
 
-    stats = {count:0};
+    stats = {count: 0};
 
     //background scenery objects
-    playBaseHeight:number = 20;
+    playerBaseHeight:number = 20;
     playBaseColor:string = "blue";
     spaceColor:string = "black";
     stars = [];
@@ -73,6 +78,12 @@ export class Game {
         this.context2D = this.canvas.getContext("2d");
         this.canvas.width = Game.CANVAS_WIDTH;
         this.canvas.height = Game.CANVAS_HEIGHT;
+
+        var noOfBases = 5;
+        var spacing = Game.CANVAS_WIDTH / noOfBases;
+        for (var i = 0; i < noOfBases; i++) {
+            this.bases.push(new Base.PlayerBase(new Common.CartesianCoordinate(spacing / 2 +(spacing * i), Game.CANVAS_HEIGHT - 100)));
+        }
         this.initGame();
     }
 
@@ -93,8 +104,8 @@ export class Game {
     }
 
     initGame() {
-        this.player.position.x = 0;
-        this.player.position.y = Game.CANVAS_HEIGHT - this.playBaseHeight - this.player.height;
+        //bottom middle
+        this.player = new GameObjects.Player(new CartesianCoordinate(Game.CANVAS_WIDTH / 2, Game.CANVAS_HEIGHT - this.playerBaseHeight - GameObjects.Player.DEFAULT_HEIGHT));
         this.player.OnShoot = function (bullet:GameObjects.Bullet) {
             this.playerBullets.push(bullet);
         }
@@ -117,7 +128,7 @@ export class Game {
         self.context2D.fillStyle = self.spaceColor;
         self.context2D.fillRect(0, 0, Game.CANVAS_WIDTH, Game.CANVAS_HEIGHT);
         self.context2D.fillStyle = self.playBaseColor;
-        self.context2D.fillRect(0, Game.CANVAS_HEIGHT - self.playBaseHeight, Game.CANVAS_WIDTH, self.playBaseHeight);
+        self.context2D.fillRect(0, Game.CANVAS_HEIGHT - self.playerBaseHeight, Game.CANVAS_WIDTH, self.playerBaseHeight);
     }
 
     addEnemy(enemy) {
@@ -126,12 +137,16 @@ export class Game {
 
     // Reset the enemies for the next wave
     nextWave() {
+        var horizontalGap = 10;
+        var verticalGap = 10;
         for (var i = 0; i <= 6; i++) {
             for (var j = 0; j <= 3; j++) {
-                if (j == 0) {
-                    var enemy:GameObjects.Enemy = new GameObjects.EnemyBoss(10 + (i * 34), 40 + (j * 25));
+                if (j == 0) { // 10+  because want to make sure not off the left which triggers drop down
+                    var enemy:GameObjects.Enemy = new GameObjects.EnemyBoss(new CartesianCoordinate(10 + i * (GameObjects.Enemy.DEFAULT_WIDTH + horizontalGap), (j * (GameObjects.Enemy.DEFAULT_HEIGHT + verticalGap))));
                 } else {
-                    enemy = new GameObjects.EnemyGrunt(10 + (i * 34), 40 + (j * 25));
+                    enemy = new GameObjects.EnemyGrunt(new CartesianCoordinate(10 + i * (GameObjects.Enemy.DEFAULT_WIDTH + horizontalGap), (j * (GameObjects.Enemy.DEFAULT_HEIGHT + verticalGap))));
+
+                    // enemy = new GameObjects.EnemyGrunt(new CartesianCoordinate(10 + (i * 34), 40 + (j * 25)));
                 }
                 this.addEnemy(enemy);
             }
@@ -140,7 +155,7 @@ export class Game {
         //init the speeds
         this.enemies.forEach(function (enemy:GameObjects.Enemy) {
             //moving to the right
-            enemy.xVelocity = 1;
+            enemy.vector.xVelocity = GameObjects.Enemy.DEFAULT_HORIZONTAL_SPEED;
         });
 
     }
@@ -201,13 +216,16 @@ export class Game {
         this.enemyBulletsSideA.forEach(function (thing:GameObjects.Bullet) {
             thing.draw(that.context2D);
         });
+        this.bases.forEach(function (thing:PlayerBase.PlayerBase) {
+            thing.draw(that.context2D);
+        });
         this.drawStats(this.context2D);
 
     }
 
     willAtLeastOneEmemyLeaveBoundsOnNextUpdate():boolean {
         for (var i = 0; i < this.enemies.length; i++) {
-            if ((this.enemies[i].x <= 0 || this.enemies[i].x >= Game.CANVAS_WIDTH - this.enemies[i].width)) {
+            if ((this.enemies[i].position.x <= 0 || this.enemies[i].position.x >= Game.CANVAS_WIDTH - this.enemies[i].dimensions.width)) {
                 return true;
             }
         }
