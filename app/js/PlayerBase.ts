@@ -5,10 +5,11 @@ Dimensions_2D = Common.Dimensions_2D;
 
 export class DestructibleScenery implements GameObject {
 
-    static DEFAULT_SIZE:number = 8;
+    static DEFAULT_SIZE:number = 4;
     position:CartesianCoordinate;
     dimensions:Dimensions_2D = new Dimensions_2D(DestructibleScenery.DEFAULT_SIZE, DestructibleScenery.DEFAULT_SIZE);
     color:string = "#0F9";
+    active:boolean = true;
 
     constructor(position) {
         this.position = position;
@@ -16,12 +17,18 @@ export class DestructibleScenery implements GameObject {
 
     draw(canvas:CanvasRenderingContext2D) {
         canvas.fillStyle = this.color;
-        canvas.fillRect(this.position.x, this.position.y, this.dimensions.width, this.dimensions.height);
+        if (this.active) {
+            canvas.fillRect(this.position.x, this.position.y, this.dimensions.width, this.dimensions.height);
+        }
     }
 
     update(elapsedUnit) {
     }
 
+    explode() {
+        this.active = false;
+        // todo boom graphic
+    }
 }
 
 /**
@@ -30,7 +37,7 @@ export class DestructibleScenery implements GameObject {
 export class PlayerBase implements GameObject {
 
     position:CartesianCoordinate; //the initial location the base is rendered, taken to be the top left of the base
-    particles =[];
+    particles = [];
 
     static DEFAULT_COLUMNS:number = 7;
 
@@ -43,18 +50,27 @@ export class PlayerBase implements GameObject {
          *******
          **   **
          */
-        for (var i = 0; i < 5; i++) {
-            this.particles.push(new DestructibleScenery(new CartesianCoordinate(position.x + DestructibleScenery.DEFAULT_SIZE * (i+1),DestructibleScenery.DEFAULT_SIZE)));
-        }
-        for (var i = 0; i < 7; i++) {
-            this.particles.push(new DestructibleScenery(new CartesianCoordinate(position.x + DestructibleScenery.DEFAULT_SIZE * i,DestructibleScenery.DEFAULT_SIZE*2)));
-        }
-        for (var i = 0; i < 7; i++) {
-            this.particles.push(new DestructibleScenery(new CartesianCoordinate(position.x + DestructibleScenery.DEFAULT_SIZE * i,DestructibleScenery.DEFAULT_SIZE*3)));
-        }
-        for (var i = 0; i < 7; i++) {
-            if(i!==(3||4||5)) {
-                this.particles.push(new DestructibleScenery(new CartesianCoordinate(position.x + DestructibleScenery.DEFAULT_SIZE * i,DestructibleScenery.DEFAULT_SIZE*4)));
+        //position relative to the base
+        /*       for (var i = 0; i < 5; i++) {
+         this.particles.push(new DestructibleScenery(new CartesianCoordinate(position.x + DestructibleScenery.DEFAULT_SIZE * (i + 1), position.y)));
+         }
+         for (var i = 0; i < 7; i++) {
+         this.particles.push(new DestructibleScenery(new CartesianCoordinate(position.x + DestructibleScenery.DEFAULT_SIZE * i, position.y + DestructibleScenery.DEFAULT_SIZE * 1)));
+         }
+         for (var i = 0; i < 7; i++) {
+         this.particles.push(new DestructibleScenery(new CartesianCoordinate(position.x + DestructibleScenery.DEFAULT_SIZE * i, position.y + DestructibleScenery.DEFAULT_SIZE * 2)));
+         }
+         for (var i = 0; i < 7; i++) {
+         if (i !== 3 && i !== 4 && i !== 5)
+         {
+         this.particles.push(new DestructibleScenery(new CartesianCoordinate(position.x + DestructibleScenery.DEFAULT_SIZE * i, position.y + DestructibleScenery.DEFAULT_SIZE * 3)));
+         }
+         }*/
+        for (var i = 0; i < 20; i++) {
+            for (var j = 0; j < 12; j++) {
+                this.particles.push(new DestructibleScenery(new CartesianCoordinate(
+                        position.x + DestructibleScenery.DEFAULT_SIZE * i,
+                        position.y + DestructibleScenery.DEFAULT_SIZE * j)))
             }
         }
     }

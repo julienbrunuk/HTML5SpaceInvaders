@@ -144,6 +144,7 @@ define(["require", "exports", "Projectile", "Common"], function(require, exports
         __extends(EnemyBoss, _super);
         function EnemyBoss(position) {
             _super.call(this, position);
+            this.probabilityOfShootingLargeBulletWhenShootong = 0.2;
             this.BasicColor = "RED";
             this.probabilityOfShooting = 0.003;
             this.health = 3;
@@ -151,7 +152,11 @@ define(["require", "exports", "Projectile", "Common"], function(require, exports
         EnemyBoss.prototype.shoot = function () {
             // todo Sound.play("shoot");
             var bulletPosition = this.midpoint();
-            return new Projectile.LargeBullet(bulletPosition, false);
+            if (Math.random() > this.probabilityOfShootingLargeBulletWhenShootong) {
+                return new Projectile.TinyBullet(bulletPosition, false);
+            } else {
+                return new Projectile.LargeBullet(bulletPosition, false);
+            }
         };
         return EnemyBoss;
     })(Enemy);

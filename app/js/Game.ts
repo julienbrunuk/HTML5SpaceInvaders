@@ -20,9 +20,10 @@ export class Game {
     static CANVAS_WIDTH:number = 800;
     static CANVAS_HEIGHT:number = 600;
 
+    waveNumber:number = 0;
     NUMBER_OF_STARS:number = 50;
     FPS:number = 45; // this will depend on latency
-    bases = [];
+    bases:Array<Base.PlayerBase>;
     enemies = [];
     playerBullets = [];
 
@@ -59,6 +60,7 @@ export class Game {
         this.updateBullets(elapsedReduced);
         this.updatePlayer(elapsedReduced);
         this.updateEnemies(elapsedReduced);
+        this.updateBases();
         this.handleCollisions();
 
         var middle = this.timestamp();
@@ -68,6 +70,10 @@ export class Game {
 
         this.updateStats(middle - start, end - middle);
         this.lastFrame = start;
+
+        if (this.enemies.length === 0) {
+            this.nextWave();
+        }
     }
 
     timestamp():number {
@@ -79,12 +85,18 @@ export class Game {
         this.canvas.width = Game.CANVAS_WIDTH;
         this.canvas.height = Game.CANVAS_HEIGHT;
 
-        var noOfBases = 5;
+
+        this.createBases();
+        this.initGame();
+    }
+
+    createBases() {
+        this.bases = new Array<Base.PlayerBase>();// clear old one if there
+        var noOfBases = 4;
         var spacing = Game.CANVAS_WIDTH / noOfBases;
         for (var i = 0; i < noOfBases; i++) {
-            this.bases.push(new Base.PlayerBase(new Common.CartesianCoordinate(spacing / 2 +(spacing * i), Game.CANVAS_HEIGHT - 100)));
+            this.bases.push(new Base.PlayerBase(new Common.CartesianCoordinate(spacing / 2 + (spacing * i), Game.CANVAS_HEIGHT - 150)));
         }
-        this.initGame();
     }
 
     onKeyDown(evt) {
@@ -137,6 +149,8 @@ export class Game {
 
     // Reset the enemies for the next wave
     nextWave() {
+        this.waveNumber++;
+        this.waveNumber % 5 === 0 ? this.createBases() : null; //give the user new bases every 5 waves
         var horizontalGap = 10;
         var verticalGap = 10;
         for (var i = 0; i <= 6; i++) {
@@ -177,29 +191,52 @@ export class Game {
         }
     }
 
-    collides(a, b) {
-        return a.x < b.x + b.width &&
-            a.x + a.width > b.x &&
-            a.y < b.y + b.height &&
-            a.y + a.height > b.y;
+    collides(a:GameObject, b:GameObject) {
+        return a.position.x < b.position.x + b.dimensions.width &&
+            a.position.x + a.dimensions.width > b.position.x &&
+            a.position.y < b.position.y + b.dimensions.height &&
+            a.position.y + a.dimensions.height > b.position.y;
     }
 
     handleCollisions() {
         var self = this;
         self.playerBullets.forEach(function (bullet:GameObjects.Bullet) {
-            self.enemies.forEach(function (enemy:GameObjects.Enemy) {
-                if (self.collides(bullet, enemy)) {
-                    enemy.explode();
-                    bullet.active = false;
-                }
-            });
-        });
+                self.enemies.forEach(function (enemy:GameObjects.Enemy) {
+                    if (self.collides(bullet, enemy)) {
+                        enemy.explode();
+                        bullet.active = false;
+                    }
+                });
+                //todo optimise for max base height
+                self.bases.forEach(function (base:Base.PlayerBase) {
+
+                    base.particles.forEach(function (particle:Base.DestructibleScenery) {
+                        if (self.collides(bullet, particle)) {
+                            particle.explode();
+                            bullet.active = false;
+                        }
+                    })
+                })
+
+
+            }
+        );
+
+
         self.enemyBulletsSideA.forEach(function (bullet:GameObjects.Bullet) {
             if (self.collides(bullet, self.player)) {
                 self.player.explode();
+                bullet.active = false;
             }
+            self.bases.forEach(function (base:Base.PlayerBase) {
+                base.particles.forEach(function (particle:Base.DestructibleScenery) {
+                    if (self.collides(bullet, particle)) {
+                        particle.explode();
+                        bullet.active = false;
+                    }
+                })
+            })
         });
-
     }
 
     draw() {
@@ -249,15 +286,27 @@ export class Game {
         });
     }
 
+    /**
+     * Remove scenery that has been hit
+     */
+    updateBases() {
+        var self = this;
+        self.bases.forEach(function (base:Base.PlayerBase) {
+            base.particles = base.particles.filter(function (particle) {
+                return particle.active;
+            });
+        });
+    }
+
     updatePlayer(elapsedTime:number) {
         if (this.leftDown) {
-            this.player.xVelocity = -this.player.DefaultMovementSpeed;
+            this.player.vector.xVelocity = -this.player.DefaultMovementSpeed;
         }
         else if (this.rightDown) {
-            this.player.xVelocity = this.player.DefaultMovementSpeed;
+            this.player.vector.xVelocity = this.player.DefaultMovementSpeed;
         }
         else {
-            this.player.xVelocity = 0;
+            this.player.vector.xVelocity = 0;
         }
         this.player.update(elapsedTime)
         this.player.clamp(Game.CANVAS_WIDTH);
@@ -271,13 +320,15 @@ export class Game {
             bullet.update(elapsedUnit);
         });
 
-
+        this.enemyBulletsSideA = this.enemyBulletsSideA.filter(function (bullet) {
+            return bullet.active;
+        });
         this.enemyBulletsSideA.forEach(function (bullet:GameObjects.Bullet) {
             bullet.update(elapsedUnit);
         });
     }
 
-    //Pluming
+//Pluming
     addEvent(obj, type, fn) {
         obj.addEventListener(type, fn, false);
     }
@@ -296,8 +347,9 @@ export class Game {
         };
     }
 
-    //_______________________________________________________________________________todo remove this in prod
+//_______________________________________________________________________________todo remove this in prod
     updateStats(update, draw) {
+        this.stats.wave = this.waveNumber;
         this.stats.update = Math.max(1, update);
         this.stats.draw = Math.max(1, draw);
         this.stats.frame = this.stats.update + this.stats.draw;
@@ -311,6 +363,7 @@ export class Game {
         ctx.fillText("fps: " + Math.round(this.stats.fps), Game.CANVAS_WIDTH - 100, Game.CANVAS_HEIGHT - 50);
         ctx.fillText("update: " + Math.round(this.stats.update) + "ms", Game.CANVAS_WIDTH - 100, Game.CANVAS_HEIGHT - 40);
         ctx.fillText("draw: " + Math.round(this.stats.draw) + "ms", Game.CANVAS_WIDTH - 100, Game.CANVAS_HEIGHT - 30);
+        ctx.fillText("wave: " + this.waveNumber , Game.CANVAS_WIDTH - 100, Game.CANVAS_HEIGHT - 20);
     }
 
     loadImages(sources, callback) { /* load multiple images and callback when ALL have finished loading */

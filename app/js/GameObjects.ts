@@ -13,7 +13,7 @@ export class Player implements GameObject {
 
     position:CartesianCoordinate;
     dimensions:Dimensions_2D = new Dimensions_2D(Player.DEFAULT_WIDTH, Player.DEFAULT_HEIGHT);
-    vector:Vector_2D = new Vector_2D(0,0);
+    vector:Vector_2D = new Vector_2D(0, 0);
     static DEFAULT_HEIGHT:number = 20;
     static DEFAULT_WIDTH:number = 20;
     DefaultMovementSpeed:number = 10;
@@ -108,8 +108,8 @@ export class Enemy implements GameObject {
     static DEFAULT_HORIZONTAL_SPEED:number = 4;
 
     position:CartesianCoordinate;
-    dimensions:Dimensions_2D = new Dimensions_2D(Enemy.DEFAULT_WIDTH,Enemy.DEFAULT_HEIGHT);
-    vector:Vector_2D = new Vector_2D(0,0);
+    dimensions:Dimensions_2D = new Dimensions_2D(Enemy.DEFAULT_WIDTH, Enemy.DEFAULT_HEIGHT);
+    vector:Vector_2D = new Vector_2D(0, 0);
 
     DefaultProjectitleSpeed:number = 4;
     active:boolean = true;
@@ -165,6 +165,8 @@ export class EnemyGrunt extends Enemy {
 
 export class EnemyBoss extends Enemy {
 
+    probabilityOfShootingLargeBulletWhenShootong = 0.2;
+
     constructor(position:CartesianCoordinate) {
         super(position);
         this.BasicColor = "RED";
@@ -175,6 +177,10 @@ export class EnemyBoss extends Enemy {
     shoot() {
         // todo Sound.play("shoot");
         var bulletPosition:CartesianCoordinate = this.midpoint();
-        return new Projectile.LargeBullet(bulletPosition, false);
+        if (Math.random() > this.probabilityOfShootingLargeBulletWhenShootong) {
+            return new Projectile.TinyBullet(bulletPosition, false);
+        } else {
+            return new Projectile.LargeBullet(bulletPosition, false);
+        }
     }
 }

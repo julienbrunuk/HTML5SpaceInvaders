@@ -18,19 +18,19 @@ export class Bullet implements GameObject {
 
     position:CartesianCoordinate;
     dimensions:Dimensions_2D;
-    vector:Vector_2D = new Vector_2D(0,0);
+    vector:Vector_2D;
 
 
     active:boolean = true;
 
     constructor(position:CartesianCoordinate, vector:Vector_2D) {
-        this.position=position;
+        this.position = position;
+        this.vector = vector;
     }
 
     inBounds() {
-        return this.position.x >= 0 && (this.position.x - this.dimensions.width <= Game.CANVAS_WIDTH ) &&
-            this.position.y >= 0 && (this.position.y - this.dimensions.height <= Game.CANVAS_HEIGHT);
-        return true;
+        return this.position.x >= 0 && (this.position.x - this.dimensions.width <= Game.Game.CANVAS_WIDTH ) &&
+            this.position.y >= 0 && (this.position.y - this.dimensions.height <= Game.Game.CANVAS_HEIGHT);
     }
 
     draw(canvas:CanvasRenderingContext2D) {
@@ -49,8 +49,9 @@ export class TinyBullet extends Bullet {
 
     //Grunts usually fire this
     constructor(postion:CartesianCoordinate, isFromPlayer) {
-        super(postion, new Vector_2D(0, Bullet.SLOW_MOVEMENT_SPEED));
-        this.dimensions = new Dimensions_2D(Bullet.SMALL_SIZE,Bullet.SMALL_SIZE);
+        //players shoot upward
+        super(postion, new Vector_2D(0, isFromPlayer ? Bullet.SLOW_MOVEMENT_SPEED * -1 : Bullet.SLOW_MOVEMENT_SPEED));
+        this.dimensions = new Dimensions_2D(Bullet.SMALL_SIZE, Bullet.SMALL_SIZE);
         this.color = "white";
     }
 }
@@ -61,7 +62,7 @@ export class LargeBullet extends Bullet {
     constructor(postion:CartesianCoordinate, isFromPlayer) {
         super(postion, new Vector_2D(0, Bullet.FAST_MOVEMENT_SPEED));
 
-        this.dimensions = new Dimensions_2D(Bullet.LARGE_SIZE,Bullet.LARGE_SIZE);
+        this.dimensions = new Dimensions_2D(Bullet.LARGE_SIZE, Bullet.LARGE_SIZE);
         this.color = "yellow";
     }
 }
