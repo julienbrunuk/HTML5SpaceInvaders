@@ -1,10 +1,16 @@
 ///<reference path="./d.ts/lib.d.ts" />
 ///<reference path="./GameObjects.ts"/>
+///<reference path="./Invaders.ts"/>
 ///<reference path="./Common.ts"/>
 ///<reference path="./PlayerBase.ts"/>
+///<reference path="./Player.ts"/>
+///<reference path="./Waves.ts"/>
 
 import GameObjects = require("GameObjects")
+import Invaders = require("Invaders")
 import Base = require("PlayerBase")
+import Player = require("Player")
+import Waves = require("Waves")
 
 
 import Common = require("Common")
@@ -29,7 +35,7 @@ export class Game {
 
     enemyBulletsSideA = [];
 
-    player:GameObjects.Player;
+    player:Player.Player;
 
     canvas:HTMLCanvasElement = <HTMLCanvasElement> document.getElementById('canvas');
 
@@ -123,7 +129,7 @@ export class Game {
 
     initGame() {
         //bottom middle
-        this.player = new GameObjects.Player(new CartesianCoordinate(Game.CANVAS_WIDTH / 2, Game.CANVAS_HEIGHT - this.playerBaseHeight - GameObjects.Player.DEFAULT_HEIGHT));
+        this.player = new Player.Player(new CartesianCoordinate(Game.CANVAS_WIDTH / 2, Game.CANVAS_HEIGHT - this.playerBaseHeight - Player.Player.DEFAULT_HEIGHT));
         this.player.OnShoot = function (bullet:GameObjects.Bullet) {
             this.playerBullets.push(bullet);
         }
@@ -157,27 +163,33 @@ export class Game {
     nextWave() {
         this.waveNumber++;
         this.waveNumber % 5 === 0 ? this.createBases() : null; //give the user new bases every 5 waves
-        var horizontalGap = 10;
-        var verticalGap = 10;
-        for (var i = 0; i <= 6; i++) {
-            for (var j = 0; j <= 3; j++) {
-                if (j == 0) { // 10+  because want to make sure not off the left which triggers drop down
-                    var enemy:GameObjects.Enemy = new GameObjects.EnemyBoss(new CartesianCoordinate(10 + i * (GameObjects.Enemy.DEFAULT_WIDTH + horizontalGap), (j * (GameObjects.Enemy.DEFAULT_HEIGHT + verticalGap))));
-                } else {
-                    enemy = new GameObjects.EnemyGrunt(new CartesianCoordinate(10 + i * (GameObjects.Enemy.DEFAULT_WIDTH + horizontalGap), (j * (GameObjects.Enemy.DEFAULT_HEIGHT + verticalGap))));
 
-                    // enemy = new GameObjects.EnemyGrunt(new CartesianCoordinate(10 + (i * 34), 40 + (j * 25)));
-                }
-                this.addEnemy(enemy);
+        switch (this.waveNumber){
+            case 1:{
+                this.enemies = Waves.Wave1();
+                break;
+            }
+            case 2:{
+                this.enemies = Waves.Wave2();
+                break;
+            }
+            case 3:{
+                this.enemies = Waves.Wave3();
+                break;
+            }
+            case 4:{
+                this.enemies = Waves.Wave4();
+                break;
+            }
+            case 5:{
+                this.enemies = Waves.Wave1();
+                break;
+            }
+            case 6:{
+                this.enemies = Waves.Wave1();
+                break;
             }
         }
-
-        //init the speeds
-        this.enemies.forEach(function (enemy:GameObjects.Enemy) {
-            //moving to the right
-            enemy.vector.xVelocity = GameObjects.Enemy.DEFAULT_HORIZONTAL_SPEED;
-        });
-
     }
 
 
@@ -199,10 +211,11 @@ export class Game {
 
     handleCollisions() {
         var self = this;
-        self.playerBullets.forEach(function (bullet:GameObjects.Bullet) {
-                self.enemies.forEach(function (enemy:GameObjects.Enemy) {
+        self.playerBullets.forEach(function (bullet:Projectile.Bullet) {
+                self.enemies.forEach(function (enemy:Invaders.Enemy) {
                     if (self.collides(bullet, enemy)) {
-                        enemy.explode();
+
+                        enemy.takeHit(bullet);
                         bullet.active = false;
                     }
                 });
@@ -276,7 +289,7 @@ export class Game {
             return;
         }
 
-        this.enemies.forEach(function (enemy:GameObjects.Enemy) {
+        this.enemies.forEach(function (enemy:Invaders.Enemy) {
             //moving to the right
             enemy.vector.xVelocity = enemy.vector.xVelocity * -1;
             enemy.position.x += offset * -1;
@@ -290,17 +303,17 @@ export class Game {
         self.enemies = self.enemies.filter(function (enemy) {
             return enemy.active;
         });
-        self.enemies.forEach(function (enemy:GameObjects.Enemy) {
+        self.enemies.forEach(function (enemy:Invaders.Enemy) {
             console.log(enemy.position.x);
         })
-        self.enemies.forEach(function (enemy:GameObjects.Enemy) {
+        self.enemies.forEach(function (enemy:Invaders.Enemy) {
             enemy.update(elapsedUnit);// this might move things out of bounds so check next
         });
 
         self.ReverseEnemyDirectionIfOutOfBoundsAndDropDown();
 
         //shoot after above check is done
-        self.enemies.forEach(function (enemy:GameObjects.Enemy) {
+        self.enemies.forEach(function (enemy:Invaders.Enemy) {
 
             if (Math.random() < enemy.probabilityOfShooting) {
                 var fire = enemy.shoot();
@@ -311,7 +324,7 @@ export class Game {
                 }
             }
         });
-        self.enemies.forEach(function (enemy:GameObjects.Enemy) {
+        self.enemies.forEach(function (enemy:Invaders.Enemy) {
             console.log(enemy.position.x);
         })
     }

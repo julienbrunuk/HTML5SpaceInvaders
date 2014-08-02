@@ -19,6 +19,7 @@ export class Bullet implements GameObject {
     position:CartesianCoordinate;
     dimensions:Dimensions_2D;
     vector:Vector_2D;
+    damageInflicted:number;
 
 
     active:boolean = true;
@@ -59,16 +60,42 @@ export class TinyBullet extends Bullet {
         }
         this.dimensions = new Dimensions_2D(Bullet.SMALL_SIZE, Bullet.SMALL_SIZE);
         this.color = "white";
+        this.damageInflicted = 1;
+
+    }
+}
+
+export class PlayerBullet extends Bullet {
+
+    //Grunts usually fire this
+    constructor(postion:CartesianCoordinate, customVector:Vector_2D =null) {
+        //players shoot upward
+
+        if(!customVector){
+            super(postion, new Vector_2D(0, Bullet.FAST_MOVEMENT_SPEED * -1 ));
+        }else{
+            super(postion, customVector);
+        }
+        this.dimensions = new Dimensions_2D(Bullet.SMALL_SIZE, Bullet.SMALL_SIZE);
+        this.color = 0xAAB;
+        this.damageInflicted = 1;
     }
 }
 
 export class LargeBullet extends Bullet {
 
-    //Grunts usually fire this
-    constructor(postion:CartesianCoordinate, isFromPlayer) {
-        super(postion, new Vector_2D(0, Bullet.FAST_MOVEMENT_SPEED));
+    //stronger enemies usually fire this
+    constructor(postion:CartesianCoordinate, isFromPlayer,customVector:Vector_2D =null) {
+        //super(postion, new Vector_2D(0, Bullet.FAST_MOVEMENT_SPEED));
+
+        if(!customVector){
+            super(postion, new Vector_2D(0, isFromPlayer ? Bullet.FAST_MOVEMENT_SPEED * -1 : Bullet.FAST_MOVEMENT_SPEED));
+        }else{
+            super(postion, customVector);
+        }
 
         this.dimensions = new Dimensions_2D(Bullet.LARGE_SIZE, Bullet.LARGE_SIZE);
         this.color = "yellow";
+        this.damageInflicted = 3;
     }
 }
