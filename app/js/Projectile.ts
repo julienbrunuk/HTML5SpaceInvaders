@@ -9,7 +9,7 @@ export class Bullet implements GameObject {
     static MEDIUM_MOVEMENT_SPEED:number = 4;
     static FAST_MOVEMENT_SPEED:number = 6;
 
-    static SMALL_SIZE:number = 2;
+    static SMALL_SIZE:number = 3;
     static LARGE_SIZE:number = 9;
 
 
@@ -47,10 +47,16 @@ export class Bullet implements GameObject {
 
 export class TinyBullet extends Bullet {
 
+
     //Grunts usually fire this
-    constructor(postion:CartesianCoordinate, isFromPlayer) {
+    constructor(postion:CartesianCoordinate, isFromPlayer, customVector:Vector_2D =null) {
         //players shoot upward
-        super(postion, new Vector_2D(0, isFromPlayer ? Bullet.SLOW_MOVEMENT_SPEED * -1 : Bullet.SLOW_MOVEMENT_SPEED));
+
+        if(!customVector){
+            super(postion, new Vector_2D(0, isFromPlayer ? Bullet.SLOW_MOVEMENT_SPEED * -1 : Bullet.SLOW_MOVEMENT_SPEED));
+        }else{
+            super(postion, customVector);
+        }
         this.dimensions = new Dimensions_2D(Bullet.SMALL_SIZE, Bullet.SMALL_SIZE);
         this.color = "white";
     }

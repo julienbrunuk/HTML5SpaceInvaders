@@ -30,7 +30,7 @@ define(["require", "exports", "Game"], function(require, exports, Game) {
         Bullet.MEDIUM_MOVEMENT_SPEED = 4;
         Bullet.FAST_MOVEMENT_SPEED = 6;
 
-        Bullet.SMALL_SIZE = 2;
+        Bullet.SMALL_SIZE = 3;
         Bullet.LARGE_SIZE = 9;
         return Bullet;
     })();
@@ -39,9 +39,14 @@ define(["require", "exports", "Game"], function(require, exports, Game) {
     var TinyBullet = (function (_super) {
         __extends(TinyBullet, _super);
         //Grunts usually fire this
-        function TinyBullet(postion, isFromPlayer) {
+        function TinyBullet(postion, isFromPlayer, customVector) {
+            if (typeof customVector === "undefined") { customVector = null; }
             //players shoot upward
-            _super.call(this, postion, new Vector_2D(0, isFromPlayer ? Bullet.SLOW_MOVEMENT_SPEED * -1 : Bullet.SLOW_MOVEMENT_SPEED));
+            if (!customVector) {
+                _super.call(this, postion, new Vector_2D(0, isFromPlayer ? Bullet.SLOW_MOVEMENT_SPEED * -1 : Bullet.SLOW_MOVEMENT_SPEED));
+            } else {
+                _super.call(this, postion, customVector);
+            }
             this.dimensions = new Dimensions_2D(Bullet.SMALL_SIZE, Bullet.SMALL_SIZE);
             this.color = "white";
         }

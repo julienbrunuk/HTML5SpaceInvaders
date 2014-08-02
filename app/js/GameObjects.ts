@@ -16,7 +16,7 @@ export class Player implements GameObject {
     vector:Vector_2D = new Vector_2D(0, 0);
     static DEFAULT_HEIGHT:number = 20;
     static DEFAULT_WIDTH:number = 20;
-    DefaultMovementSpeed:number = 10;
+    DefaultMovementSpeed:number = 7;
 
     currentWeapon:Bullet;
     public OnShoot:Function;
@@ -34,15 +34,24 @@ export class Player implements GameObject {
 
     update(elapsedUnit) {
         this.position.x += this.vector.xVelocity * elapsedUnit;
+        this.position.y += this.vector.yVelocity * elapsedUnit;
     }
 
-    clamp(gameWidth:number) {
+    clamp(gameWidth:number,gameHeight:number) {
         if (this.position.x < 0) {
             this.position.x = 0;
             return;
         }
         else if (this.position.x > (gameWidth - this.dimensions.width)) {
             this.position.x = gameWidth - this.dimensions.width;
+            return;
+        }
+        else if (this.position.y < 0) {
+            this.position.y = 0;
+            return;
+        }
+        else if (this.position.y > (gameHeight - this.dimensions.height)) {
+            this.position.y = gameHeight - this.dimensions.height;
             return;
         }
     }
@@ -72,7 +81,7 @@ export class Star implements GameObject {
     static MAX_RADIUS:number = 3;
     color:string = "white";
     position:CartesianCoordinate;
-
+    dimensions:Dimensions_2D; //todo, work this out from radius
 
     radius:number;
     twinkles:boolean = false;        //changes colour
@@ -100,6 +109,7 @@ export class Star implements GameObject {
     }
 }
 
+
 export class Enemy implements GameObject {
     health:number;
 
@@ -111,10 +121,7 @@ export class Enemy implements GameObject {
     dimensions:Dimensions_2D = new Dimensions_2D(Enemy.DEFAULT_WIDTH, Enemy.DEFAULT_HEIGHT);
     vector:Vector_2D = new Vector_2D(0, 0);
 
-    DefaultProjectitleSpeed:number = 4;
     active:boolean = true;
-
-
     probabilityOfShooting:number = 0.001;
 
     BasicColor:string;
@@ -159,13 +166,14 @@ export class EnemyGrunt extends Enemy {
     shoot() {
         // todo Sound.play("shoot");
         var bulletPosition:CartesianCoordinate = this.midpoint();
-        return new Projectile.TinyBullet(bulletPosition, false);
+          return new Projectile.TinyBullet(bulletPosition, false);
     }
 }
 
 export class EnemyBoss extends Enemy {
 
     probabilityOfShootingLargeBulletWhenShootong = 0.2;
+    probabilityOfShootingScatterWhenShooting = 0.2;
 
     constructor(position:CartesianCoordinate) {
         super(position);
@@ -176,11 +184,38 @@ export class EnemyBoss extends Enemy {
 
     shoot() {
         // todo Sound.play("shoot");
-        var bulletPosition:CartesianCoordinate = this.midpoint();
-        if (Math.random() > this.probabilityOfShootingLargeBulletWhenShootong) {
-            return new Projectile.TinyBullet(bulletPosition, false);
-        } else {
-            return new Projectile.LargeBullet(bulletPosition, false);
+
+
+        var x = Math.random();
+        if ( x > 2 && x <= 0.3) {
+            var num = 10;
+            //shoot at angle 225 - 295 degress
+            var arr = [];
+            for (var i = 0; i < num; i++) {
+                var angle = 225 + i * (90 / num);
+                var radAngle = (angle / 360) * 2 * Math.PI;
+                var customVector = new Vector_2D(-Math.cos(radAngle), -Math.sin(radAngle));
+                arr.push(new Projectile.TinyBullet(this.midpoint(), false, customVector));
+            }
+            return arr;
         }
+        //slow fan of 100
+        if (x > 0.4 && x <= 0.5) {
+            var num = 50;
+            //shoot at angle 225 - 295 degress
+            var arr = [];
+            for (var i = 0; i < num; i++) {
+                var angle = 225 + i * (90 / num);
+                var radAngle = (angle / 360) * 2 * Math.PI;
+                var customVector = new Vector_2D(-Math.cos(radAngle)/2, -Math.sin(radAngle)/2);
+                arr.push(new Projectile.TinyBullet(this.midpoint(), false, customVector));
+            }
+            return arr;
+        }
+        else if (x > 0.5 && x < 1) {
+            return new Projectile.LargeBullet(this.midpoint(), false);
+        }
+
+
     }
 }

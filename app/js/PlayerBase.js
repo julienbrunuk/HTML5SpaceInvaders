@@ -23,7 +23,7 @@ define(["require", "exports", "Common"], function(require, exports, Common) {
             this.active = false;
             // todo boom graphic
         };
-        DestructibleScenery.DEFAULT_SIZE = 4;
+        DestructibleScenery.DEFAULT_SIZE = 5;
         return DestructibleScenery;
     })();
     exports.DestructibleScenery = DestructibleScenery;
@@ -36,8 +36,8 @@ define(["require", "exports", "Common"], function(require, exports, Common) {
             this.particles = [];
             this.position = position;
 
-            for (var i = 0; i < 20; i++) {
-                for (var j = 0; j < 12; j++) {
+            for (var i = 0; i < 18; i++) {
+                for (var j = 0; j < 10; j++) {
                     this.particles.push(new DestructibleScenery(new CartesianCoordinate(position.x + DestructibleScenery.DEFAULT_SIZE * i, position.y + DestructibleScenery.DEFAULT_SIZE * j)));
                 }
             }

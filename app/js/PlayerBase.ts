@@ -5,7 +5,7 @@ Dimensions_2D = Common.Dimensions_2D;
 
 export class DestructibleScenery implements GameObject {
 
-    static DEFAULT_SIZE:number = 4;
+    static DEFAULT_SIZE:number = 5;
     position:CartesianCoordinate;
     dimensions:Dimensions_2D = new Dimensions_2D(DestructibleScenery.DEFAULT_SIZE, DestructibleScenery.DEFAULT_SIZE);
     color:string = "#0F9";
@@ -66,8 +66,8 @@ export class PlayerBase implements GameObject {
          this.particles.push(new DestructibleScenery(new CartesianCoordinate(position.x + DestructibleScenery.DEFAULT_SIZE * i, position.y + DestructibleScenery.DEFAULT_SIZE * 3)));
          }
          }*/
-        for (var i = 0; i < 20; i++) {
-            for (var j = 0; j < 12; j++) {
+        for (var i = 0; i < 18; i++) {
+            for (var j = 0; j < 10; j++) {
                 this.particles.push(new DestructibleScenery(new CartesianCoordinate(
                         position.x + DestructibleScenery.DEFAULT_SIZE * i,
                         position.y + DestructibleScenery.DEFAULT_SIZE * j)))

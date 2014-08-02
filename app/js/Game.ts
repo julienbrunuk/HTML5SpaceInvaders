@@ -47,6 +47,8 @@ export class Game {
     //for the key events
     rightDown:boolean = false;
     leftDown:boolean = false;
+    upDown:boolean = false;
+    downDown:boolean = false;
     space:boolean = false;
 
     lastFrame:number = this.timestamp();//init to current time
@@ -102,6 +104,8 @@ export class Game {
     onKeyDown(evt) {
         if (evt.keyCode == Common.KEYS.RIGHT) this.rightDown = true;
         else if (evt.keyCode == Common.KEYS.LEFT) this.leftDown = true;
+        else if (evt.keyCode == Common.KEYS.UP) this.upDown = true;
+        else if (evt.keyCode == Common.KEYS.DOWN) this.downDown = true;
         if (evt.keyCode == Common.KEYS.SPACE) {
             this.space = true;
             this.playerBullets.push(this.player.shoot());
@@ -110,9 +114,11 @@ export class Game {
     }
 
     onKeyUp(evt) {
-        if (evt.keyCode == 39) this.rightDown = false;
-        if (evt.keyCode == 37) this.leftDown = false;
-        if (evt.keyCode == 32) this.space = false;
+        if (evt.keyCode == Common.KEYS.RIGHT) this.rightDown = false;
+        if (evt.keyCode == Common.KEYS.LEFT) this.leftDown = false;
+        if (evt.keyCode == Common.KEYS.UP) this.upDown = false;
+        if (evt.keyCode == Common.KEYS.DOWN) this.downDown = false;
+        if (evt.keyCode == Common.KEYS.SPACE) this.space = false;
     }
 
     initGame() {
@@ -174,13 +180,6 @@ export class Game {
 
     }
 
-    reverseEnemyWaveAndDropDown() {
-        this.enemies.forEach(function (enemy:GameObjects.Enemy) {
-            //moving to the right
-            enemy.vector.xVelocity = enemy.vector.xVelocity * -1;
-            enemy.position.y += enemy.dimensions.height;
-        });
-    }
 
     createStars() {
         for (var i = 0; i <= this.NUMBER_OF_STARS; i++) {
@@ -260,30 +259,61 @@ export class Game {
 
     }
 
-    willAtLeastOneEmemyLeaveBoundsOnNextUpdate():boolean {
+    ReverseEnemyDirectionIfOutOfBoundsAndDropDown():boolean {
+        var offset = 0;
         for (var i = 0; i < this.enemies.length; i++) {
-            if ((this.enemies[i].position.x <= 0 || this.enemies[i].position.x >= Game.CANVAS_WIDTH - this.enemies[i].dimensions.width)) {
-                return true;
+            if (this.enemies[i].position.x < 0) {
+                offset = this.enemies[i].position.x;
+                break;
+            }
+            else if (this.enemies[i].position.x > (Game.CANVAS_WIDTH - this.enemies[i].dimensions.width))
+            {
+                offset = this.enemies[i].position.x -  (Game.CANVAS_WIDTH -this.enemies[i].dimensions.width);
+                break;
             }
         }
-        return false;
+        if (offset === 0) {
+            return;
+        }
+
+        this.enemies.forEach(function (enemy:GameObjects.Enemy) {
+            //moving to the right
+            enemy.vector.xVelocity = enemy.vector.xVelocity * -1;
+            enemy.position.x += offset * -1;
+            enemy.position.y += enemy.dimensions.height;
+        });
     }
 
     updateEnemies(elapsedUnit:number) {
-        var self = this
+        var self = this;
 
         self.enemies = self.enemies.filter(function (enemy) {
             return enemy.active;
         });
-        if (self.willAtLeastOneEmemyLeaveBoundsOnNextUpdate()) {
-            self.reverseEnemyWaveAndDropDown();
-        }
         self.enemies.forEach(function (enemy:GameObjects.Enemy) {
-            enemy.update(elapsedUnit);
+            console.log(enemy.position.x);
+        })
+        self.enemies.forEach(function (enemy:GameObjects.Enemy) {
+            enemy.update(elapsedUnit);// this might move things out of bounds so check next
+        });
+
+        self.ReverseEnemyDirectionIfOutOfBoundsAndDropDown();
+
+        //shoot after above check is done
+        self.enemies.forEach(function (enemy:GameObjects.Enemy) {
+
             if (Math.random() < enemy.probabilityOfShooting) {
-                self.enemyBulletsSideA.push(enemy.shoot());
+                var fire = enemy.shoot();
+                if (fire.length) {
+                    self.enemyBulletsSideA = self.enemyBulletsSideA.concat(fire);
+                } else {
+                    self.enemyBulletsSideA.push(fire);
+                }
             }
         });
+        self.enemies.forEach(function (enemy:GameObjects.Enemy) {
+            console.log(enemy.position.x);
+        })
     }
 
     /**
@@ -305,11 +335,18 @@ export class Game {
         else if (this.rightDown) {
             this.player.vector.xVelocity = this.player.DefaultMovementSpeed;
         }
+        else if (this.upDown) {
+            this.player.vector.yVelocity = -this.player.DefaultMovementSpeed;
+        }
+        else if (this.downDown) {
+            this.player.vector.yVelocity = this.player.DefaultMovementSpeed;
+        }
         else {
             this.player.vector.xVelocity = 0;
+            this.player.vector.yVelocity = 0;
         }
         this.player.update(elapsedTime)
-        this.player.clamp(Game.CANVAS_WIDTH);
+        this.player.clamp(Game.CANVAS_WIDTH,Game.CANVAS_HEIGHT);
     }
 
     updateBullets(elapsedUnit:number) {
@@ -363,7 +400,7 @@ export class Game {
         ctx.fillText("fps: " + Math.round(this.stats.fps), Game.CANVAS_WIDTH - 100, Game.CANVAS_HEIGHT - 50);
         ctx.fillText("update: " + Math.round(this.stats.update) + "ms", Game.CANVAS_WIDTH - 100, Game.CANVAS_HEIGHT - 40);
         ctx.fillText("draw: " + Math.round(this.stats.draw) + "ms", Game.CANVAS_WIDTH - 100, Game.CANVAS_HEIGHT - 30);
-        ctx.fillText("wave: " + this.waveNumber , Game.CANVAS_WIDTH - 100, Game.CANVAS_HEIGHT - 20);
+        ctx.fillText("wave: " + this.waveNumber, Game.CANVAS_WIDTH - 100, Game.CANVAS_HEIGHT - 20);
     }
 
     loadImages(sources, callback) { /* load multiple images and callback when ALL have finished loading */

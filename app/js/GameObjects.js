@@ -16,7 +16,7 @@ define(["require", "exports", "Projectile", "Common"], function(require, exports
             this.color = "#F0A";
             this.dimensions = new Dimensions_2D(Player.DEFAULT_WIDTH, Player.DEFAULT_HEIGHT);
             this.vector = new Vector_2D(0, 0);
-            this.DefaultMovementSpeed = 10;
+            this.DefaultMovementSpeed = 7;
             this.position = position;
         }
         Player.prototype.draw = function (context2D) {
@@ -27,14 +27,21 @@ define(["require", "exports", "Projectile", "Common"], function(require, exports
 
         Player.prototype.update = function (elapsedUnit) {
             this.position.x += this.vector.xVelocity * elapsedUnit;
+            this.position.y += this.vector.yVelocity * elapsedUnit;
         };
 
-        Player.prototype.clamp = function (gameWidth) {
+        Player.prototype.clamp = function (gameWidth, gameHeight) {
             if (this.position.x < 0) {
                 this.position.x = 0;
                 return;
             } else if (this.position.x > (gameWidth - this.dimensions.width)) {
                 this.position.x = gameWidth - this.dimensions.width;
+                return;
+            } else if (this.position.y < 0) {
+                this.position.y = 0;
+                return;
+            } else if (this.position.y > (gameHeight - this.dimensions.height)) {
+                this.position.y = gameHeight - this.dimensions.height;
                 return;
             }
         };
@@ -91,7 +98,6 @@ define(["require", "exports", "Projectile", "Common"], function(require, exports
         function Enemy(position) {
             this.dimensions = new Dimensions_2D(Enemy.DEFAULT_WIDTH, Enemy.DEFAULT_HEIGHT);
             this.vector = new Vector_2D(0, 0);
-            this.DefaultProjectitleSpeed = 4;
             this.active = true;
             this.probabilityOfShooting = 0.001;
             this.position = position;
@@ -145,17 +151,43 @@ define(["require", "exports", "Projectile", "Common"], function(require, exports
         function EnemyBoss(position) {
             _super.call(this, position);
             this.probabilityOfShootingLargeBulletWhenShootong = 0.2;
+            this.probabilityOfShootingScatterWhenShooting = 0.2;
             this.BasicColor = "RED";
             this.probabilityOfShooting = 0.003;
             this.health = 3;
         }
         EnemyBoss.prototype.shoot = function () {
             // todo Sound.play("shoot");
-            var bulletPosition = this.midpoint();
-            if (Math.random() > this.probabilityOfShootingLargeBulletWhenShootong) {
-                return new Projectile.TinyBullet(bulletPosition, false);
-            } else {
-                return new Projectile.LargeBullet(bulletPosition, false);
+            var x = Math.random();
+            if (x > 2 && x <= 0.3) {
+                var num = 10;
+
+                //shoot at angle 225 - 295 degress
+                var arr = [];
+                for (var i = 0; i < num; i++) {
+                    var angle = 225 + i * (90 / num);
+                    var radAngle = (angle / 360) * 2 * Math.PI;
+                    var customVector = new Vector_2D(-Math.cos(radAngle), -Math.sin(radAngle));
+                    arr.push(new Projectile.TinyBullet(this.midpoint(), false, customVector));
+                }
+                return arr;
+            }
+
+            //slow fan of 100
+            if (x > 0.4 && x <= 0.5) {
+                var num = 50;
+
+                //shoot at angle 225 - 295 degress
+                var arr = [];
+                for (var i = 0; i < num; i++) {
+                    var angle = 225 + i * (90 / num);
+                    var radAngle = (angle / 360) * 2 * Math.PI;
+                    var customVector = new Vector_2D(-Math.cos(radAngle) / 2, -Math.sin(radAngle) / 2);
+                    arr.push(new Projectile.TinyBullet(this.midpoint(), false, customVector));
+                }
+                return arr;
+            } else if (x > 0.5 && x < 1) {
+                return new Projectile.LargeBullet(this.midpoint(), false);
             }
         };
         return EnemyBoss;
