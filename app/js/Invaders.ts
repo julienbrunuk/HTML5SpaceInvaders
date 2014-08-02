@@ -15,7 +15,7 @@ export class Enemy implements GameObject {
 
     static DEFAULT_HEIGHT:number = 12;
     static DEFAULT_WIDTH:number = 30;
-    static DEFAULT_HORIZONTAL_SPEED:number = 4;
+    static DEFAULT_HORIZONTAL_SPEED:number = 2;
 
     position:CartesianCoordinate;
     dimensions:Dimensions_2D = new Dimensions_2D(Enemy.DEFAULT_WIDTH, Enemy.DEFAULT_HEIGHT);
@@ -125,6 +125,43 @@ export class EnemyBoss extends Enemy {
         this.BasicColor = "RED";
         this.probabilityOfShooting = 0.003;
         this.health = 3;
+    }
+
+    shoot() {
+        // todo Sound.play("shoot");
+
+
+        var x = Math.random();
+
+
+        if (x > 2 && x <= 0.3) {
+            return this.shootSmallFan();
+        }
+        //slow fan of 100
+        if (x > 0.4 && x <= 0.5) {
+           // return this.shootLargeSlowfan();
+            return this.shootLargeFastfan();
+        }
+        else if (x > 0.5 && x < 1) {
+            return new Projectile.LargeBullet(this.midpoint(), false);
+        }
+
+
+    }
+
+
+}export class EnemyKing extends Enemy {
+
+    static DEFAULT_WIDTH:number = 100;
+    static DEFAULT_HEIGHT:number = 40;
+
+    constructor(position:CartesianCoordinate) {
+        super(position);
+        this.BasicColor = "WHITE";
+        this.probabilityOfShooting = 0.03;
+        this.health = 15;
+        this.dimensions = new Dimensions_2D(100, 40);
+
     }
 
     shoot() {

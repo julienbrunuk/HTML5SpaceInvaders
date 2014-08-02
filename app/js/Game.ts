@@ -26,7 +26,7 @@ export class Game {
     static CANVAS_WIDTH:number = 800;
     static CANVAS_HEIGHT:number = 600;
 
-    waveNumber:number = 0;
+    waveNumber:number = 6;
     NUMBER_OF_STARS:number = 50;
     FPS:number = 45; // this will depend on latency
     bases:Array<Base.PlayerBase>;
@@ -182,13 +182,26 @@ export class Game {
                 break;
             }
             case 5:{
-                this.enemies = Waves.Wave1();
+                this.enemies = Waves.Wave5();
                 break;
             }
             case 6:{
-                this.enemies = Waves.Wave1();
+                this.enemies = Waves.Wave6();
                 break;
             }
+            case 7:{
+                this.enemies = Waves.Wave7();
+                break;
+            }
+            case 8:{
+                this.enemies = Waves.Wave8();
+                break;
+            }
+            case 9:{
+                this.enemies = Waves.Wave9();
+                break;
+            }
+                alert("You win!! Well done.");
         }
     }
 
@@ -293,7 +306,8 @@ export class Game {
             //moving to the right
             enemy.vector.xVelocity = enemy.vector.xVelocity * -1;
             enemy.position.x += offset * -1;
-            enemy.position.y += enemy.dimensions.height;
+         //   enemy.position.y += enemy.dimensions.height;
+            enemy.position.y += 10;
         });
     }
 
@@ -303,9 +317,7 @@ export class Game {
         self.enemies = self.enemies.filter(function (enemy) {
             return enemy.active;
         });
-        self.enemies.forEach(function (enemy:Invaders.Enemy) {
-            console.log(enemy.position.x);
-        })
+
         self.enemies.forEach(function (enemy:Invaders.Enemy) {
             enemy.update(elapsedUnit);// this might move things out of bounds so check next
         });
@@ -324,9 +336,7 @@ export class Game {
                 }
             }
         });
-        self.enemies.forEach(function (enemy:Invaders.Enemy) {
-            console.log(enemy.position.x);
-        })
+
     }
 
     /**
