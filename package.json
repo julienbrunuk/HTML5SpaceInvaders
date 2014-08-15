@@ -22,7 +22,8 @@
     "karma": "^0.12.1",
     "karma-jasmine": "^0.1.5",
     "karma-chrome-launcher": "^0.1.2",
-    "tape": "^2.13.3"
+    "tape": "^2.13.3",
+    "gulp-connect": "^2.0.6"
   },
   "keywords": [
     "Canvas",

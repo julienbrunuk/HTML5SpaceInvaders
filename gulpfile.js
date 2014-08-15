@@ -2,6 +2,7 @@ var jshint = require('gulp-jshint');
 var gulp = require('gulp');
 var jade = require('gulp-jade');
 var tsc = require('gulp-typescript-compiler');
+connect = require('gulp-connect');
 
 var FOLDERS = {};
 //FOLDERS.CLIENT_TS_ROOT = 'app/ts';
@@ -49,6 +50,23 @@ gulp.task('tsc', function () {
 		.pipe(gulp.dest('dist/client'));
 
 });
+
+gulp.task('html', function () {
+	gulp.src('./app/*.html')
+		.pipe(connect.reload());
+});
+
+gulp.task('watch', function () {
+	gulp.watch(['./app/*.html','./app/js/*.js'], ['html']);
+});
+gulp.task('connect', function() {
+	connect.server({
+		root: 'app',
+		livereload: true
+	});
+});
+gulp.task('default', ['connect', 'watch']);
+
 
 /*
 gulp.task('connect', connect.server({
