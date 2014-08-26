@@ -134,7 +134,7 @@ export class EnemyBoss extends Enemy {
         var x = Math.random();
 
 
-        if (x > 2 && x <= 0.3) {
+        if (x > 0.2 && x <= 0.3) {
             return this.shootSmallFan();
         }
         //slow fan of 100
@@ -171,11 +171,11 @@ export class EnemyBoss extends Enemy {
         var x = Math.random();
 
 
-        if (x > 2 && x <= 0.3) {
+        if (x > 0.25 && x <= 0.3) {
             return this.shootSmallFan();
         }
         //slow fan of 100
-        if (x > 0.4 && x <= 0.5) {
+        if (x > 0.45 && x <= 0.5) {
            // return this.shootLargeSlowfan();
             return this.shootLargeFastfan();
         }

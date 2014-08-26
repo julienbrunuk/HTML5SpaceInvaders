@@ -23,8 +23,8 @@ interface Object {
 }
 
 export class Game {
-    static CANVAS_WIDTH:number = 800;
-    static CANVAS_HEIGHT:number = 600;
+    static CANVAS_WIDTH:number = 1000;
+    static CANVAS_HEIGHT:number = 800;
 
     waveNumber:number = 0;
     NUMBER_OF_STARS:number = 50;

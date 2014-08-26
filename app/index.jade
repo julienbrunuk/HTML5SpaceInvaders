@@ -1,10 +1,9 @@
 doctype html
-html(ng-app="HTML5SpaceApp")
+html()
     head
         title Space Invaders
-        script(language='javascript', src='bower_components/angular/angular.js', type='text/javascript')
         script(language='javascript', src='bower_components/requirejs/require.js', type='text/javascript', data-main='js/Main.js')
-        script(language='javascript', src='http://cdn.peerjs.com/0.3/peer.js', type='text/javascript')
+        //script(language='javascript', src='http://cdn.peerjs.com/0.3/peer.js', type='text/javascript')
         script(language='javascript', src='bower_components/platform/platform.js', type='text/javascript')
         //link(rel="import", href="elements/elements.html" )
         link(rel="import", href="bower_components/polymer/polymer.html" )
@@ -22,7 +21,6 @@ html(ng-app="HTML5SpaceApp")
             body {
                 font-family: sans-serif;
             }
-
             core-scaffold {
                 position: absolute;
                 top: 0;
@@ -45,7 +43,7 @@ html(ng-app="HTML5SpaceApp")
             core-scaffold[mode=cover] .content {
                 margin: 20px 100px 20px 0;
             }
-    body(unresolved='unresolved' ng-controller="UICtrl")
+    body(unresolved='unresolved')
         core-scaffold
             core-header-panel(navigation='navigation', flex='flex', mode='seamed')
                 core-toolbar(style='background-color: #526E9C; color: #fff;') HTML5 Space Invaders
@@ -55,4 +53,4 @@ html(ng-app="HTML5SpaceApp")
             div(class="contnet") Title
                 canvas#canvas
                 p Keys:  Arrows = movment, Space = shoot
-
+            script(language='javascript', src='bower_components/requirejs/require.js', type='text/javascript', data-main='js/Main.js')

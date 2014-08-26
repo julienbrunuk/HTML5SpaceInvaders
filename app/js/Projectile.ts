@@ -8,6 +8,7 @@ export class Bullet implements GameObject {
     static SLOW_MOVEMENT_SPEED:number = 2;
     static MEDIUM_MOVEMENT_SPEED:number = 4;
     static FAST_MOVEMENT_SPEED:number = 6;
+    static VERY_FAST_MOVEMENT_SPEED:number = 12;
 
     static SMALL_SIZE:number = 3;
     static LARGE_SIZE:number = 9;
@@ -72,7 +73,7 @@ export class PlayerBullet extends Bullet {
         //players shoot upward
 
         if(!customVector){
-            super(postion, new Vector_2D(0, Bullet.FAST_MOVEMENT_SPEED * -1 ));
+            super(postion, new Vector_2D(0, Bullet.VERY_FAST_MOVEMENT_SPEED * -1 ));
         }else{
             super(postion, customVector);
         }

@@ -58,6 +58,7 @@ gulp.task('html', function () {
 
 gulp.task('watch', function () {
 	gulp.watch(['./app/*.html','./app/js/*.js'], ['html']);
+	gulp.watch(['./app/js/*.ts'], ['buildDev']);
 });
 gulp.task('connect', function() {
 	connect.server({
