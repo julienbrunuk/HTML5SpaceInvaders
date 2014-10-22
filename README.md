@@ -1,6 +1,7 @@
-HTML5SpaceInvaders (not working new features in dev)
+HTML5SpaceInvaders 
 ========
 
+Currently setting up a Demo server for this game
 
 ### Gameplay
 This game is a multi-player js game based on space invaders. There are 2 screens where players compete.
