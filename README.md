@@ -1,5 +1,5 @@
 HTML5SpaceInvaders 
-========
+==================
 
 Currently setting up a Demo server for this game
 
@@ -17,3 +17,4 @@ uses Peer.js
 
 ###TODO
 * Decide if I need an authoritive server to stop client side cheating.
+
