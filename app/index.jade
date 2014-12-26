@@ -1,56 +1,27 @@
 doctype html
 html()
-    head
-        title Space Invaders
-        script(language='javascript', src='bower_components/requirejs/require.js', type='text/javascript', data-main='js/Main.js')
-        //script(language='javascript', src='http://cdn.peerjs.com/0.3/peer.js', type='text/javascript')
-        script(language='javascript', src='bower_components/platform/platform.js', type='text/javascript')
-        //link(rel="import", href="elements/elements.html" )
-        link(rel="import", href="bower_components/polymer/polymer.html" )
-        link(rel='import', href='bower_components/core-scaffold/core-scaffold.html')
-        link(rel='import', href='bower_components/core-header-panel/core-header-panel.html')
-        link(rel='import', href='bower_components/core-menu/core-menu.html')
-        link(rel='import', href='bower_components/core-menu/core-toolbar.html')
-        link(rel='import', href='bower_components/core-item/core-item.html')
-        style.
-            html, body {
-                height: 100%;
-                margin: 0;
-            }
+  head
+    title Space Invaders
+    script(language='javascript', src='../bower_components/requirejs/require.js', type='text/javascript', data-main='js/Main.js')
+    //script(language='javascript', src='http://cdn.peerjs.com/0.3/peer.js', type='text/javascript')
+    script(language='javascript', src='../bower_components/platform/platform.js', type='text/javascript')
+    style.
+      html, body {
+        height: 100%;
+        margin: 0;
+      }
 
-            body {
-                font-family: sans-serif;
-            }
-            core-scaffold {
-                position: absolute;
-                top: 0;
-                right: 0;
-                bottom: 0;
-                left: 0;
-            }
+      body {
+        font-family: sans-serif;
+      }
 
-            .content {
-                background-color: #fff;
-                height: 5000px;
-                padding: 20px;
-            }
-
-            /* some default styles for mode="cover" on core-scaffold */
-            core-scaffold[mode=cover]::shadow core-header-panel::shadow #mainContainer {
-                left: 120px;
-            }
-
-            core-scaffold[mode=cover] .content {
-                margin: 20px 100px 20px 0;
-            }
-    body(unresolved='unresolved')
-        core-scaffold
-            core-header-panel(navigation='navigation', flex='flex', mode='seamed')
-                core-toolbar(style='background-color: #526E9C; color: #fff;') HTML5 Space Invaders
-                core-menu
-                    core-item(icon='settings', label='Restart game')
-                    core-item(icon='settings', label='Skip Wave')
-            div(class="contnet") Title
-                canvas#canvas
-                p Keys:  Arrows = movment, Space = shoot
-            script(language='javascript', src='bower_components/requirejs/require.js', type='text/javascript', data-main='js/Main.js')
+      .content {
+        background-color: #fff;
+        height: 5000px;
+        padding: 20px;
+      }
+  body(unresolved='unresolved')
+    div(class="contnet") Title
+      canvas#canvas
+      p Keys:  Arrows = movment, Space = shoot
+    script(language='javascript', src='bower_components/requirejs/require.js', type='text/javascript', data-main='js/Main.js')

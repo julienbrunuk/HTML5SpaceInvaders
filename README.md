@@ -1,7 +1,14 @@
 HTML5SpaceInvaders 
 ==================
+### Running the game
 
-Currently setting up a Demo server for this game
+To play the game, run these commands after downloading the repo.
+
+1)npm install
+
+2) bower install
+
+3) gulp
 
 ### Gameplay
 This game is a multi-player js game based on space invaders. There are 2 screens where players compete.
