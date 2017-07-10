@@ -2,6 +2,8 @@ HTML5SpaceInvaders
 ==================
 ### Running the game
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/julienbrunuk/HTML5SpaceInvaders.svg)](https://greenkeeper.io/)
+
 To play the game, run these commands after downloading the repo.
 
 1)npm install
